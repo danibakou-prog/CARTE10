@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>?????? ????? ??????</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&family=Fira+Code:wght@400;500&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
+        
+        :root {
+            --gold-primary: #d4af37; /* ???? ??????? */
+            --gold-light: #f9f1c7;   /* ???? ???? ???? */
+            --gold-dark: #b8860b;    /* ???? ???? */
+            --bg-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Noto Sans Arabic', 'Plus Jakarta Sans', sans-serif;
+            background-color: #fafafa;
+            background-image: radial-gradient(circle at 2px 2px, rgba(212, 175, 55, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .gold-card {
+            background: var(--bg-white);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 20px 40px -10px rgba(212, 175, 55, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-area {
+            font-family: 'Fira Code', monospace;
+            direction: ltr;
+            background: #fdfdfd;
+            border: 2px solid #f1f1f1;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ????? ?????? ??????/?????? ?????? */
+        .flash-success {
+            animation: gold-glow 0.8s ease-out;
+            border-color: #10b981 !important; /* ???? ???? ??????? */
+        }
+
+        .text-flash {
+            animation: text-glow 0.8s ease-out;
+        }
+
+        @keyframes gold-glow {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 30px 10px rgba(16, 185, 129, 0.2); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes text-glow {
+            0% { color: var(--gold-dark); transform: scale(1); }
+            50% { color: #10b981; transform: scale(1.05); }
+            100% { color: var(--gold-dark); transform: scale(1); }
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(212, 175, 55, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            background: var(--gold-light);
+            color: var(--gold-dark);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* ???? ????? */
+        .gold-gradient-bar {
+            height: 4px;
+            background: linear-gradient(to right, #d4af37, #f9f1c7, #b8860b);
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="w-full max-w-xl gold-card rounded-[2rem] relative border border-gold-200">
+        <!-- ???? ?????? ?????? -->
+        <div class="gold-gradient-bar"></div>
+
+        <!-- Header -->
+        <div class="px-8 py-6 flex justify-between items-center border-b border-gray-100 relative z-10 bg-white">
+            <div class="flex items-center gap-3">
+                <div class="bg-gold-50 p-2 rounded-xl">
+                    <i data-lucide="crown" class="w-5 h-5 text-[#d4af37]"></i>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Elite Activation</span>
+                    <h2 class="text-sm font-bold text-gray-800">???? ??????? ??????</h2>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-lg">??????? ??? 1</span>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="p-8 relative z-10 bg-white">
+            <!-- Instructions Box -->
+            <div class="mb-8 bg-amber-50/50 border border-amber-100 rounded-2xl p-5">
+                <h4 class="text-xs font-bold text-amber-900 mb-4 flex items-center gap-2">
+                    <i data-lucide="help-circle" class="w-4 h-4 text-amber-600"></i>
+                    ????? ????? ??????? ???????:
+                </h4>
+                <div class="text-xs text-amber-800/80 space-y-3">
+                    <div class="instruction-item">
+                        <span class="step-number">1</span>
+                        <p>???? ??? <b>??? ?????</b> ??????? ?? ??????.</p>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="step-number">2</span>
+                        <p>???? ????? ???????? ????? ?? ???? <b>"??? ???????"</b>.</p>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="step-number">3</span>
+                        <p>?? ???? <b>???</b> ????? ??? ?? "????? ???????".</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-5 px-1">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-800">??? ??????? ??????</h3>
+                    <p class="text-[10px] text-gray-400">???? ????????? ???? ????? ???</p>
+                </div>
+                
+                <button 
+                    id="mainCopyBtn"
+                    class="copy-btn px-5 py-2.5 rounded-xl flex items-center gap-2 font-bold text-xs"
+                >
+                    <i data-lucide="copy" id="defaultIcon" class="w-4 h-4"></i>
+                    <i data-lucide="check" id="successIcon" class="w-4 h-4 hidden"></i>
+                    <span id="btnLabel">??? ?????</span>
+                </button>
+            </div>
+
+            <!-- Code Area -->
+            <div id="codeWrapper" class="code-area rounded-2xl p-10 relative overflow-hidden text-center group">
+                <!-- Watermark -->
+                <div class="absolute inset-0 opacity-[0.03] pointer-events-none flex items-center justify-center">
+                    <i data-lucide="shield" class="w-32 h-32 text-amber-900"></i>
+                </div>
+                
+                <code id="targetCode" class="text-3xl md:text-4xl font-bold tracking-[0.15em] text-amber-700 block relative z-10 transition-all duration-300">gfghh3TGC4555HG</code>
+                <div class="mt-4 text-[9px] text-amber-600/50 uppercase tracking-[0.3em] font-bold">Secure Access Token</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-8 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
+            <div class="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
+                <i data-lucide="fingerprint" class="w-3.5 h-3.5"></i>
+                ???? ???? ?????
+            </div>
+            <div id="copyCounter" class="text-[9px] font-black text-amber-600/40 uppercase">??? ????????: 0</div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="proToast" class="fixed bottom-8 right-8 translate-x-[150%] transition-transform duration-500 ease-in-out z-[100]">
+        <div class="bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border-b-4 border-emerald-500">
+            <div class="bg-emerald-500/20 p-2 rounded-lg">
+                <i data-lucide="sparkles" class="w-5 h-5 text-emerald-400"></i>
+            </div>
+            <div>
+                <p class="font-bold text-sm">?? ????? ?????!</p>
+                <p class="text-[10px] text-gray-400">????? ???? ???? ????? ?? ???????.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const copyBtn = document.getElementById('mainCopyBtn');
+        const codeElement = document.getElementById('targetCode');
+        const codeWrapper = document.getElementById('codeWrapper');
+        const btnLabel = document.getElementById('btnLabel');
+        const defaultIcon = document.getElementById('defaultIcon');
+        const successIcon = document.getElementById('successIcon');
+        const toast = document.getElementById('proToast');
+        const counterEl = document.getElementById('copyCounter');
+
+        let count = 0;
+
+        copyBtn.addEventListener('click', async () => {
+            const text = codeElement.innerText;
+            
+            try {
+                await navigator.clipboard.writeText(text);
+                
+                count++;
+                counterEl.innerText = `??? ????????: ${count}`;
+                
+                // ????? ?????? ??????/??????
+                codeWrapper.classList.remove('flash-success');
+                void codeWrapper.offsetWidth; 
+                codeWrapper.classList.add('flash-success');
+
+                codeElement.classList.remove('text-flash');
+                void codeElement.offsetWidth;
+                codeElement.classList.add('text-flash');
+                
+                // ????? ????
+                btnLabel.innerText = "?? ?????!";
+                defaultIcon.classList.add('hidden');
+                successIcon.classList.remove('hidden');
+                copyBtn.classList.replace('from-[#d4af37]', 'from-emerald-500');
+                copyBtn.classList.replace('to-[#b8860b]', 'to-emerald-600');
+                
+                // ????? ???????
+                toast.classList.remove('translate-x-[150%]');
+                
+                setTimeout(() => {
+                    btnLabel.innerText = "??? ?????";
+                    defaultIcon.classList.remove('hidden');
+                    successIcon.classList.add('hidden');
+                    copyBtn.classList.replace('from-emerald-500', 'from-[#d4af37]');
+                    copyBtn.classList.replace('to-emerald-600', 'to-[#b8860b]');
+                    toast.classList.add('translate-x-[150%]');
+                }, 2500);
+
+            } catch (err) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
+        });
+    </script>
+</body>
+</html>
