@@ -3,267 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التفعيل الذهبي</title>
+    <title>بوابة التفعيل الملكية</title>
     
-    <!-- تحميل خط Cairo بشكل مباشر ومكثف لضمان الظهور -->
+    <!-- تحميل الخطوط الملكية -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
         :root {
-            --gold-primary: #d4af37;
-            --gold-light: #f9f1c7;
-            --gold-dark: #b8860b;
+            --gold-primary: #bf953f;
+            --gold-light: #fcf6ba;
+            --gold-dark: #8a642d;
+            --gold-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 45%, #b38728 55%, #aa771c 100%);
+            --luxury-shadow: 0 50px 100px -20px rgba(0,0,0,0.12), 0 30px 60px -30px rgba(0,0,0,0.15);
         }
 
         body {
-            /* استخدام خط Cairo مع بدائل نظام آمنة جداً */
-            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #fafafa;
-            background-image: radial-gradient(circle at 2px 2px, rgba(212, 175, 55, 0.05) 1px, transparent 0);
-            background-size: 40px 40px;
+            font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+            background: #f8f9fa;
+            /* نمط خلفية هندسي دقيق جداً */
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(191, 149, 63, 0.03) 0%, transparent 80%),
+                linear-gradient(rgba(220, 220, 220, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(220, 220, 220, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #333;
             margin: 0;
+            padding: 24px;
         }
 
-        .gold-card {
-            background: #ffffff;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            box-shadow: 0 20px 40px -10px rgba(212, 175, 55, 0.15);
+        .main-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: var(--luxury-shadow);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .gold-accent-line {
+            height: 6px;
+            background: var(--gold-gradient);
+            border-radius: 40px 40px 0 0;
+        }
+
+        /* تصميم منطقة الرمز بشكل مخملي */
+        .token-display-box {
+            background: #1a1a1a;
             position: relative;
             overflow: hidden;
-            width: 90%;
-            max-width: 480px;
+            border-radius: 24px;
+            transition: all 0.5s ease;
         }
 
-        .code-area {
+        .token-display-box::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(252, 246, 186, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .token-display-box:hover::after {
+            opacity: 1;
+        }
+
+        .token-text {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-family: 'Courier New', Courier, monospace;
-            direction: ltr;
-            background: #fdfdfd;
-            border: 2px solid #f1f1f1;
-            transition: all 0.4s ease;
+            letter-spacing: 2px;
         }
 
-        .flash-success {
-            animation: success-pulse 0.8s ease-out;
-            border-color: #10b981 !important;
+        .copy-trigger {
+            background: var(--gold-gradient);
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        .text-flash {
-            animation: text-pulse 0.8s ease-out;
+        .copy-trigger:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px -5px rgba(138, 100, 45, 0.4);
         }
 
-        @keyframes success-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            50% { box-shadow: 0 0 30px 10px rgba(16, 185, 129, 0.2); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        .copy-trigger::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
         }
 
-        @keyframes text-pulse {
-            0% { color: var(--gold-dark); transform: scale(1); }
-            50% { color: #10b981; transform: scale(1.05); text-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
-            100% { color: var(--gold-dark); transform: scale(1); }
+        .copy-trigger:hover::before {
+            left: 100%;
         }
 
-        .copy-btn {
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+        .instruction-pill {
+            background: #ffffff;
+            border: 1px solid #f0f0f0;
             transition: all 0.3s ease;
-            color: white;
-            border: none;
-            cursor: pointer;
         }
 
-        .copy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(212, 175, 55, 0.3);
+        .instruction-pill:hover {
+            border-color: var(--gold-primary);
+            transform: translateX(-5px);
         }
 
-        .step-number {
-            background: var(--gold-light);
-            color: var(--gold-dark);
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 14px;
-            margin-left: 10px;
+        /* أنيميشن النجاح */
+        @keyframes ripple {
+            to { transform: scale(4); opacity: 0; }
         }
 
-        .gold-line {
-            height: 4px;
-            background: linear-gradient(to right, #d4af37, #f9f1c7, #b8860b);
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
         }
     </style>
 </head>
 <body>
 
-    <div class="gold-card rounded-[2rem]">
-        <div class="gold-line"></div>
-
-        <!-- الجزء العلوي -->
-        <div class="px-8 py-6 flex justify-between items-center border-b border-gray-50 bg-white">
-            <div class="flex items-center gap-3">
-                <div class="bg-amber-50 p-2 rounded-xl">
-                    <i data-lucide="crown" class="w-5 h-5 text-[#d4af37]"></i>
+    <div class="main-card rounded-[3rem] p-1">
+        <div class="gold-accent-line"></div>
+        
+        <div class="bg-white rounded-[2.8rem] overflow-hidden">
+            <!-- Header Section -->
+            <div class="px-10 pt-10 pb-6 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-black flex items-center justify-center shadow-lg transform -rotate-6">
+                        <i data-lucide="crown" class="w-7 h-7 text-[#fcf6ba]"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black text-gray-900 tracking-tight">نظام النخبة</h1>
+                        <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            Elite Member Access
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <span class="block text-[10px] font-bold text-gray-400 tracking-widest uppercase">ELITE ACTIVATION</span>
-                    <h2 class="text-sm font-bold text-gray-800">نظام التفعيل الذهبي</h2>
-                </div>
-            </div>
-            <div class="bg-amber-100 px-3 py-1 rounded-lg">
-                <span class="text-[10px] font-bold text-amber-700">البطاقة رقم 1</span>
-            </div>
-        </div>
-
-        <!-- المحتوى -->
-        <div class="p-8 text-right">
-            <div class="mb-8 bg-amber-50/40 border border-amber-100 rounded-2xl p-5">
-                <h4 class="text-xs font-bold text-amber-900 mb-4 flex items-center gap-2">
-                    <i data-lucide="info" class="w-4 h-4 text-amber-600"></i>
-                    تعليمات التفعيل للبطاقة:
-                </h4>
-                <div class="space-y-4">
-                    <div class="flex items-start">
-                        <span class="step-number">1</span>
-                        <p class="text-xs text-amber-800/80 mt-1">اضغط على زر <b>نسخ الرمز</b> الموضح أدناه.</p>
-                    </div>
-                    <div class="flex items-start">
-                        <span class="step-number">2</span>
-                        <p class="text-xs text-amber-800/80 mt-1">افتح تطبيقك وانتقل لخانة <b>رمز التوثيق</b>.</p>
-                    </div>
-                    <div class="flex items-start">
-                        <span class="step-number">3</span>
-                        <p class="text-xs text-amber-800/80 mt-1">قم بعمل <b>لصق</b> واضغط تفعيل للإنهاء.</p>
-                    </div>
+                <div class="text-left">
+                    <div class="text-[9px] font-bold text-gray-400 uppercase">Status</div>
+                    <div class="text-[11px] font-black text-emerald-600">نشط ومؤمن</div>
                 </div>
             </div>
 
-            <div class="flex justify-between items-center mb-5">
-                <div>
-                    <h3 class="text-sm font-bold text-gray-800">رمز التفعيل الفريد</h3>
-                    <p class="text-[10px] text-gray-400">صالح للاستخدام الفوري</p>
-                </div>
+            <!-- Content Body -->
+            <div class="px-10 py-4">
                 
-                <button id="mainCopyBtn" class="copy-btn px-4 py-2 rounded-xl flex items-center gap-2 font-bold text-xs">
-                    <i data-lucide="copy" id="defaultIcon" class="w-4 h-4 text-white"></i>
-                    <i data-lucide="check" id="successIcon" class="w-4 h-4 text-white hidden"></i>
-                    <span id="btnLabel">نسخ الرمز</span>
-                </button>
+                <!-- Instruction Steps -->
+                <div class="space-y-3 mb-10">
+                    <div class="instruction-pill p-4 rounded-2xl flex items-center gap-4 group">
+                        <div class="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-400 group-hover:bg-amber-50 group-hover:text-amber-600 transition-colors">01</div>
+                        <p class="text-xs font-bold text-gray-600">انسخ الرمز الملكي الموضح بالأسفل بنقرة واحدة.</p>
+                    </div>
+                    <div class="instruction-pill p-4 rounded-2xl flex items-center gap-4 group">
+                        <div class="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-400 group-hover:bg-amber-50 group-hover:text-amber-600 transition-colors">02</div>
+                        <p class="text-xs font-bold text-gray-600">توجه إلى "مركز التوثيق" داخل التطبيق الخاص بك.</p>
+                    </div>
+                </div>
+
+                <!-- Token Area -->
+                <div class="relative group">
+                    <div class="flex justify-between items-center mb-3 px-2">
+                        <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest">Authentication Token</span>
+                        <div class="flex gap-1">
+                            <div class="w-1 h-1 rounded-full bg-gray-200"></div>
+                            <div class="w-1 h-1 rounded-full bg-gray-200"></div>
+                            <div class="w-1 h-1 rounded-full bg-amber-400"></div>
+                        </div>
+                    </div>
+
+                    <div id="copyArea" class="token-display-box p-12 flex flex-col items-center justify-center cursor-pointer shadow-2xl">
+                        <code class="token-text text-3xl md:text-5xl font-black mb-2">GLD-882-TRX-Q9</code>
+                        <div class="text-[9px] text-gray-500 font-bold tracking-[0.4em] uppercase opacity-60">Verified Premium Asset</div>
+                    </div>
+
+                    <!-- Floating Copy Button -->
+                    <button id="floatingBtn" class="copy-trigger absolute -bottom-6 left-1/2 -translate-x-1/2 px-10 py-4 rounded-2xl flex items-center gap-3 shadow-xl">
+                        <i data-lucide="copy" class="w-4 h-4 text-[#4a3701]"></i>
+                        <span class="text-xs font-black text-[#4a3701]">نسخ الرمز الآن</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- منطقة الكود -->
-            <div id="codeWrapper" class="code-area rounded-2xl p-8 relative overflow-hidden text-center">
-                <code id="targetCode" class="text-2xl md:text-3xl font-bold tracking-[0.1em] text-amber-700 block transition-all duration-300">GLD-882-TRX-Q9</code>
-                <div class="mt-4 text-[9px] text-amber-600/50 uppercase tracking-[0.3em] font-bold">Secure Access Token</div>
+            <!-- Footer Section -->
+            <div class="mt-16 px-10 pb-10">
+                <div class="pt-8 border-t border-gray-100 flex justify-between items-center">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] font-bold text-gray-400 uppercase mb-1">Security Protocol</span>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+                            <span class="text-[10px] font-black text-gray-800">تشفير AES-256 بت نشط</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-2 rounded-xl flex items-center gap-2">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 text-gray-400"></i>
+                        <span id="timestamp" class="text-[10px] font-bold text-gray-500 tracking-tighter">--:--:--</span>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <!-- التذييل -->
-        <div class="px-8 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
-            <div class="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-                اتصال آمن وموثوق
-            </div>
-            <div id="copyCounter" class="text-[9px] font-bold text-amber-600/40 uppercase">السجل: 0</div>
         </div>
     </div>
 
-    <!-- إشعار النجاح -->
-    <div id="proToast" class="fixed bottom-8 right-8 translate-x-[150%] transition-transform duration-500 ease-in-out z-[100]">
-        <div class="bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border-b-4 border-emerald-500">
-            <div class="bg-emerald-500/20 p-2 rounded-lg text-emerald-400">
-                <i data-lucide="check-circle" class="w-5 h-5"></i>
+    <!-- Success Toast -->
+    <div id="successToast" class="fixed bottom-12 left-1/2 -translate-x-1/2 translate-y-40 opacity-0 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] z-50">
+        <div class="bg-black text-white px-8 py-5 rounded-[2rem] shadow-2xl flex items-center gap-5 min-w-[320px]">
+            <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500">
+                <i data-lucide="sparkles" class="w-5 h-5"></i>
             </div>
             <div>
-                <p class="font-bold text-sm">تم النسخ بنجاح!</p>
-                <p class="text-[10px] text-gray-400">الرمز الآن في الحافظة.</p>
+                <p class="font-black text-sm">اكتمل النسخ بنجاح</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Token Added to Clipboard</p>
             </div>
         </div>
     </div>
 
     <script>
-        // التأكد من تحميل الأيقونات بعد تحميل الصفحة
-        window.addEventListener('load', () => {
-            lucide.createIcons();
-        });
+        lucide.createIcons();
 
-        const copyBtn = document.getElementById('mainCopyBtn');
-        const codeElement = document.getElementById('targetCode');
-        const codeWrapper = document.getElementById('codeWrapper');
-        const btnLabel = document.getElementById('btnLabel');
-        const defaultIcon = document.getElementById('defaultIcon');
-        const successIcon = document.getElementById('successIcon');
-        const toast = document.getElementById('proToast');
-        const counterEl = document.getElementById('copyCounter');
+        const copyArea = document.getElementById('copyArea');
+        const floatingBtn = document.getElementById('floatingBtn');
+        const toast = document.getElementById('successToast');
+        const token = "GLD-882-TRX-Q9";
 
-        let count = 0;
+        // تحديث الوقت المباشر للتأثير الاحترافي
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ":" + 
+                           now.getMinutes().toString().padStart(2, '0') + ":" + 
+                           now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('timestamp').innerText = timeStr;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
 
-        copyBtn.addEventListener('click', async () => {
-            const text = codeElement.innerText;
-            
+        async function handleCopy(e) {
             try {
-                if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(text);
-                    onCopySuccess();
-                } else {
-                    throw new Error();
-                }
+                await navigator.clipboard.writeText(token);
+                
+                // تأثير التموج (Ripple Effect)
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple-effect');
+                const rect = copyArea.getBoundingClientRect();
+                ripple.style.left = (e.clientX - rect.left) + 'px';
+                ripple.style.top = (e.clientY - rect.top) + 'px';
+                ripple.style.width = ripple.style.height = Math.max(rect.width, rect.height) + 'px';
+                copyArea.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+
+                // إظهار التنبيه
+                toast.classList.remove('translate-y-40', 'opacity-0');
+                
+                setTimeout(() => {
+                    toast.classList.add('translate-y-40', 'opacity-0');
+                }, 3000);
+
             } catch (err) {
+                // الطريقة الاحتياطية
                 const textArea = document.createElement("textarea");
-                textArea.value = text;
-                textArea.style.position = "fixed";
-                textArea.style.left = "-9999px";
-                textArea.style.top = "0";
+                textArea.value = token;
                 document.body.appendChild(textArea);
-                textArea.focus();
                 textArea.select();
-                try {
-                    document.execCommand('copy');
-                    onCopySuccess();
-                } catch (e) {
-                    console.error('Copy failed');
-                }
+                document.execCommand('copy');
                 document.body.removeChild(textArea);
             }
-        });
-
-        function onCopySuccess() {
-            count++;
-            counterEl.innerText = `السجل: ${count}`;
-            
-            codeWrapper.classList.remove('flash-success');
-            void codeWrapper.offsetWidth; 
-            codeWrapper.classList.add('flash-success');
-
-            codeElement.classList.remove('text-flash');
-            void codeElement.offsetWidth;
-            codeElement.classList.add('text-flash');
-            
-            btnLabel.innerText = "تم النسخ!";
-            defaultIcon.classList.add('hidden');
-            successIcon.classList.remove('hidden');
-            
-            toast.classList.remove('translate-x-[150%]');
-            
-            setTimeout(() => {
-                btnLabel.innerText = "نسخ الرمز";
-                defaultIcon.classList.remove('hidden');
-                successIcon.classList.add('hidden');
-                toast.classList.add('translate-x-[150%]');
-            }, 2500);
         }
+
+        copyArea.addEventListener('click', handleCopy);
+        floatingBtn.addEventListener('click', handleCopy);
     </script>
 </body>
 </html>
