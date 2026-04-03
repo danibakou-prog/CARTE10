@@ -2,17 +2,18 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام التفعيل الذهبي</title>
     
-    <!-- مكتبات التنسيق والأيقونات -->
+    <!-- تحميل خط Cairo بشكل مباشر ومكثف لضمان الظهور -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        
         :root {
             --gold-primary: #d4af37;
             --gold-light: #f9f1c7;
@@ -20,8 +21,8 @@
         }
 
         body {
-            /* ترتيب الخطوط يبدأ بخطوط النظام لضمان عدم ظهور علامات استفهام */
-            font-family: 'Cairo', "Times New Roman", Arial, Tahoma, sans-serif;
+            /* استخدام خط Cairo مع بدائل نظام آمنة جداً */
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #fafafa;
             background-image: radial-gradient(circle at 2px 2px, rgba(212, 175, 55, 0.05) 1px, transparent 0);
             background-size: 40px 40px;
@@ -51,7 +52,6 @@
             transition: all 0.4s ease;
         }
 
-        /* وميض أخضر جذاب */
         .flash-success {
             animation: success-pulse 0.8s ease-out;
             border-color: #10b981 !important;
@@ -129,7 +129,6 @@
 
         <!-- المحتوى -->
         <div class="p-8 text-right">
-            <!-- صندوق التعليمات -->
             <div class="mb-8 bg-amber-50/40 border border-amber-100 rounded-2xl p-5">
                 <h4 class="text-xs font-bold text-amber-900 mb-4 flex items-center gap-2">
                     <i data-lucide="info" class="w-4 h-4 text-amber-600"></i>
@@ -137,15 +136,15 @@
                 </h4>
                 <div class="space-y-4">
                     <div class="flex items-start">
-                        <span class="step-number">١</span>
+                        <span class="step-number">1</span>
                         <p class="text-xs text-amber-800/80 mt-1">اضغط على زر <b>نسخ الرمز</b> الموضح أدناه.</p>
                     </div>
                     <div class="flex items-start">
-                        <span class="step-number">٢</span>
+                        <span class="step-number">2</span>
                         <p class="text-xs text-amber-800/80 mt-1">افتح تطبيقك وانتقل لخانة <b>رمز التوثيق</b>.</p>
                     </div>
                     <div class="flex items-start">
-                        <span class="step-number">٣</span>
+                        <span class="step-number">3</span>
                         <p class="text-xs text-amber-800/80 mt-1">قم بعمل <b>لصق</b> واضغط تفعيل للإنهاء.</p>
                     </div>
                 </div>
@@ -195,7 +194,10 @@
     </div>
 
     <script>
-        lucide.createIcons();
+        // التأكد من تحميل الأيقونات بعد تحميل الصفحة
+        window.addEventListener('load', () => {
+            lucide.createIcons();
+        });
 
         const copyBtn = document.getElementById('mainCopyBtn');
         const codeElement = document.getElementById('targetCode');
@@ -212,25 +214,26 @@
             const text = codeElement.innerText;
             
             try {
-                // محاولة استخدام Clipboard API
                 if (navigator.clipboard && window.isSecureContext) {
                     await navigator.clipboard.writeText(text);
+                    onCopySuccess();
                 } else {
-                    throw new Error('Clipboard API unavailable');
+                    throw new Error();
                 }
-                
-                onCopySuccess();
             } catch (err) {
-                // الطريقة البديلة القديمة
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-9999px";
+                textArea.style.top = "0";
                 document.body.appendChild(textArea);
+                textArea.focus();
                 textArea.select();
                 try {
                     document.execCommand('copy');
                     onCopySuccess();
                 } catch (e) {
-                    console.error('Failed to copy', e);
+                    console.error('Copy failed');
                 }
                 document.body.removeChild(textArea);
             }
