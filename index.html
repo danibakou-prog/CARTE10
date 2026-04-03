@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <!-- وسم الترميز لضمان ظهور اللغة العربية بشكل صحيح -->
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام التفعيل الذهبي</title>
     
-    <!-- استدعاء المكتبات -->
+    <!-- مكتبات التنسيق والأيقونات -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        /* إضافة خطوط بديلة في حال فشل تحميل الخط الأساسي */
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&family=Cairo:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
         
         :root {
             --gold-primary: #d4af37;
@@ -21,7 +20,8 @@
         }
 
         body {
-            font-family: 'Noto Sans Arabic', 'Cairo', Tahoma, Arial, sans-serif;
+            /* ترتيب الخطوط يبدأ بخطوط النظام لضمان عدم ظهور علامات استفهام */
+            font-family: 'Cairo', "Times New Roman", Arial, Tahoma, sans-serif;
             background-color: #fafafa;
             background-image: radial-gradient(circle at 2px 2px, rgba(212, 175, 55, 0.05) 1px, transparent 0);
             background-size: 40px 40px;
@@ -39,37 +39,37 @@
             box-shadow: 0 20px 40px -10px rgba(212, 175, 55, 0.15);
             position: relative;
             overflow: hidden;
-            width: 100%;
-            max-width: 500px;
+            width: 90%;
+            max-width: 480px;
         }
 
         .code-area {
-            font-family: 'monospace';
+            font-family: 'Courier New', Courier, monospace;
             direction: ltr;
             background: #fdfdfd;
             border: 2px solid #f1f1f1;
             transition: all 0.4s ease;
         }
 
-        /* وميض أخضر جذاب عند النسخ */
+        /* وميض أخضر جذاب */
         .flash-success {
-            animation: gold-glow 0.8s ease-out;
+            animation: success-pulse 0.8s ease-out;
             border-color: #10b981 !important;
         }
 
         .text-flash {
-            animation: text-glow 0.8s ease-out;
+            animation: text-pulse 0.8s ease-out;
         }
 
-        @keyframes gold-glow {
+        @keyframes success-pulse {
             0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
             50% { box-shadow: 0 0 30px 10px rgba(16, 185, 129, 0.2); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        @keyframes text-glow {
+        @keyframes text-pulse {
             0% { color: var(--gold-dark); transform: scale(1); }
-            50% { color: #10b981; transform: scale(1.05); }
+            50% { color: #10b981; transform: scale(1.05); text-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
             100% { color: var(--gold-dark); transform: scale(1); }
         }
 
@@ -86,13 +86,6 @@
             box-shadow: 0 8px 15px rgba(212, 175, 55, 0.3);
         }
 
-        .instruction-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
         .step-number {
             background: var(--gold-light);
             color: var(--gold-dark);
@@ -102,12 +95,12 @@
             align-items: center;
             justify-content: center;
             border-radius: 8px;
-            font-size: 12px;
             font-weight: 700;
-            flex-shrink: 0;
+            font-size: 14px;
+            margin-left: 10px;
         }
 
-        .gold-gradient-bar {
+        .gold-line {
             height: 4px;
             background: linear-gradient(to right, #d4af37, #f9f1c7, #b8860b);
         }
@@ -116,16 +109,16 @@
 <body>
 
     <div class="gold-card rounded-[2rem]">
-        <div class="gold-gradient-bar"></div>
+        <div class="gold-line"></div>
 
-        <!-- الرأس -->
-        <div class="px-8 py-6 flex justify-between items-center border-b border-gray-100 bg-white">
-            <div class="flex items-center gap-3 text-right">
+        <!-- الجزء العلوي -->
+        <div class="px-8 py-6 flex justify-between items-center border-b border-gray-50 bg-white">
+            <div class="flex items-center gap-3">
                 <div class="bg-amber-50 p-2 rounded-xl">
                     <i data-lucide="crown" class="w-5 h-5 text-[#d4af37]"></i>
                 </div>
                 <div>
-                    <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">ELITE ACTIVATION</span>
+                    <span class="block text-[10px] font-bold text-gray-400 tracking-widest uppercase">ELITE ACTIVATION</span>
                     <h2 class="text-sm font-bold text-gray-800">نظام التفعيل الذهبي</h2>
                 </div>
             </div>
@@ -134,47 +127,46 @@
             </div>
         </div>
 
-        <!-- المحتوى الرئيسي -->
-        <div class="p-8 bg-white text-right">
+        <!-- المحتوى -->
+        <div class="p-8 text-right">
             <!-- صندوق التعليمات -->
-            <div class="mb-8 bg-amber-50/50 border border-amber-100 rounded-2xl p-5">
+            <div class="mb-8 bg-amber-50/40 border border-amber-100 rounded-2xl p-5">
                 <h4 class="text-xs font-bold text-amber-900 mb-4 flex items-center gap-2">
-                    <i data-lucide="help-circle" class="w-4 h-4 text-amber-600"></i>
-                    كيفية تفعيل البطاقة الذهبية:
+                    <i data-lucide="info" class="w-4 h-4 text-amber-600"></i>
+                    تعليمات التفعيل للبطاقة:
                 </h4>
-                <div class="text-xs text-amber-800/80 space-y-3">
-                    <div class="instruction-item">
-                        <span class="step-number">1</span>
-                        <p>اضغط على <b>نسخ الرمز</b> الموجود في الأسفل.</p>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <span class="step-number">١</span>
+                        <p class="text-xs text-amber-800/80 mt-1">اضغط على زر <b>نسخ الرمز</b> الموضح أدناه.</p>
                     </div>
-                    <div class="instruction-item">
-                        <span class="step-number">2</span>
-                        <p>افتح تطبيق البطاقة، وابحث عن خانة <b>"رمز التوثيق"</b>.</p>
+                    <div class="flex items-start">
+                        <span class="step-number">٢</span>
+                        <p class="text-xs text-amber-800/80 mt-1">افتح تطبيقك وانتقل لخانة <b>رمز التوثيق</b>.</p>
                     </div>
-                    <div class="instruction-item">
-                        <span class="step-number">3</span>
-                        <p>قم بعمل <b>لصق</b> واضغط على زر "تأكيد التفعيل".</p>
+                    <div class="flex items-start">
+                        <span class="step-number">٣</span>
+                        <p class="text-xs text-amber-800/80 mt-1">قم بعمل <b>لصق</b> واضغط تفعيل للإنهاء.</p>
                     </div>
                 </div>
             </div>
 
             <div class="flex justify-between items-center mb-5">
-                <div class="text-right">
+                <div>
                     <h3 class="text-sm font-bold text-gray-800">رمز التفعيل الفريد</h3>
-                    <p class="text-[10px] text-gray-400">صالح للاستخدام لمرة واحدة فقط</p>
+                    <p class="text-[10px] text-gray-400">صالح للاستخدام الفوري</p>
                 </div>
                 
                 <button id="mainCopyBtn" class="copy-btn px-4 py-2 rounded-xl flex items-center gap-2 font-bold text-xs">
-                    <i data-lucide="copy" id="defaultIcon" class="w-4 h-4"></i>
-                    <i data-lucide="check" id="successIcon" class="w-4 h-4 hidden"></i>
+                    <i data-lucide="copy" id="defaultIcon" class="w-4 h-4 text-white"></i>
+                    <i data-lucide="check" id="successIcon" class="w-4 h-4 text-white hidden"></i>
                     <span id="btnLabel">نسخ الرمز</span>
                 </button>
             </div>
 
             <!-- منطقة الكود -->
-            <div id="codeWrapper" class="code-area rounded-2xl p-8 relative overflow-hidden text-center group">
-                <!-- تم استبدال الرمز هنا برمز جديد -->
-                <code id="targetCode" class="text-2xl md:text-3xl font-bold tracking-[0.15em] text-amber-700 block transition-all duration-300 uppercase">GLD-882-TRX-Q9</code>
+            <div id="codeWrapper" class="code-area rounded-2xl p-8 relative overflow-hidden text-center">
+                <code id="targetCode" class="text-2xl md:text-3xl font-bold tracking-[0.1em] text-amber-700 block transition-all duration-300">GLD-882-TRX-Q9</code>
                 <div class="mt-4 text-[9px] text-amber-600/50 uppercase tracking-[0.3em] font-bold">Secure Access Token</div>
             </div>
         </div>
@@ -182,22 +174,22 @@
         <!-- التذييل -->
         <div class="px-8 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
             <div class="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
-                <i data-lucide="fingerprint" class="w-3.5 h-3.5"></i>
-                نظام مشفر ومحمي
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                اتصال آمن وموثوق
             </div>
-            <div id="copyCounter" class="text-[9px] font-bold text-amber-600/40 uppercase">سجل العمليات: 0</div>
+            <div id="copyCounter" class="text-[9px] font-bold text-amber-600/40 uppercase">السجل: 0</div>
         </div>
     </div>
 
-    <!-- رسالة نجاح -->
+    <!-- إشعار النجاح -->
     <div id="proToast" class="fixed bottom-8 right-8 translate-x-[150%] transition-transform duration-500 ease-in-out z-[100]">
         <div class="bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border-b-4 border-emerald-500">
             <div class="bg-emerald-500/20 p-2 rounded-lg text-emerald-400">
-                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
             </div>
             <div>
                 <p class="font-bold text-sm">تم النسخ بنجاح!</p>
-                <p class="text-[10px] text-gray-400">الآن، توجه للصق الرمز في البطاقة.</p>
+                <p class="text-[10px] text-gray-400">الرمز الآن في الحافظة.</p>
             </div>
         </div>
     </div>
@@ -220,46 +212,55 @@
             const text = codeElement.innerText;
             
             try {
-                await navigator.clipboard.writeText(text);
+                // محاولة استخدام Clipboard API
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    throw new Error('Clipboard API unavailable');
+                }
                 
-                count++;
-                counterEl.innerText = `سجل العمليات: ${count}`;
-                
-                // وميض الإطار
-                codeWrapper.classList.remove('flash-success');
-                void codeWrapper.offsetWidth; 
-                codeWrapper.classList.add('flash-success');
-
-                // وميض النص
-                codeElement.classList.remove('text-flash');
-                void codeElement.offsetWidth;
-                codeElement.classList.add('text-flash');
-                
-                // تحديث الزر
-                btnLabel.innerText = "تم النسخ!";
-                defaultIcon.classList.add('hidden');
-                successIcon.classList.remove('hidden');
-                
-                // إظهار التنبيه
-                toast.classList.remove('translate-x-[150%]');
-                
-                setTimeout(() => {
-                    btnLabel.innerText = "نسخ الرمز";
-                    defaultIcon.classList.remove('hidden');
-                    successIcon.classList.add('hidden');
-                    toast.classList.add('translate-x-[150%]');
-                }, 2500);
-
+                onCopySuccess();
             } catch (err) {
-                // الطريقة البديلة في حال فشل Clipboard API
+                // الطريقة البديلة القديمة
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
                 document.body.appendChild(textArea);
                 textArea.select();
-                document.execCommand('copy');
+                try {
+                    document.execCommand('copy');
+                    onCopySuccess();
+                } catch (e) {
+                    console.error('Failed to copy', e);
+                }
                 document.body.removeChild(textArea);
             }
         });
+
+        function onCopySuccess() {
+            count++;
+            counterEl.innerText = `السجل: ${count}`;
+            
+            codeWrapper.classList.remove('flash-success');
+            void codeWrapper.offsetWidth; 
+            codeWrapper.classList.add('flash-success');
+
+            codeElement.classList.remove('text-flash');
+            void codeElement.offsetWidth;
+            codeElement.classList.add('text-flash');
+            
+            btnLabel.innerText = "تم النسخ!";
+            defaultIcon.classList.add('hidden');
+            successIcon.classList.remove('hidden');
+            
+            toast.classList.remove('translate-x-[150%]');
+            
+            setTimeout(() => {
+                btnLabel.innerText = "نسخ الرمز";
+                defaultIcon.classList.remove('hidden');
+                successIcon.classList.add('hidden');
+                toast.classList.add('translate-x-[150%]');
+            }, 2500);
+        }
     </script>
 </body>
 </html>
