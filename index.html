@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مشغل البث المباشر - وضع ملء الشاشة</title>
+    <title>مشغل البث المباشر - متصل بالسحابة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -34,11 +34,10 @@
             border: 1px solid #334155;
         }
 
-        /* حاوية الفيديو */
         #videoContainer {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%;
             background: #000;
         }
 
@@ -78,18 +77,6 @@
 
         .btn-primary:hover {
             background-color: #1d4ed8;
-            transform: translateY(-1px);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid #475569;
-            color: #cbd5e1;
-        }
-
-        .btn-outline:hover {
-            background-color: #334155;
-            border-color: #64748b;
         }
 
         .live-indicator {
@@ -99,7 +86,6 @@
             color: #ef4444;
             font-weight: bold;
             font-size: 0.9rem;
-            text-transform: uppercase;
         }
 
         .dot {
@@ -111,84 +97,120 @@
         }
 
         @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1); }
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
     <header class="p-4 bg-slate-950 flex justify-between items-center px-8 border-b border-slate-800">
         <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.934a.5.5 0 0 0-.777-.416L16 11z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
-            <span class="font-bold text-xl tracking-tight">البث المباشر المتقدم</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="12" x="2" y="6" rx="2"/><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.934a.5.5 0 0 0-.777-.416L16 11z"/></svg>
+            <span class="font-bold text-xl">بث مباشر ذكي</span>
         </div>
         <div class="live-indicator">
             <span class="dot"></span>
-            مباشر الآن
+            مباشر
         </div>
     </header>
 
     <div class="main-container">
         <div class="player-card">
-            <!-- حاوية الفيديو -->
             <div id="videoContainer">
                 <iframe 
                     id="mainFrame"
                     src="https://testjojoo.s3.eu-north-1.amazonaws.com/bein3.html" 
                     allow="autoplay; encrypted-media; fullscreen" 
-                    allowfullscreen="true"
-                    webkitallowfullscreen="true" 
-                    mozallowfullscreen="true"
-                    title="Live Stream">
+                    allowfullscreen="true">
                 </iframe>
             </div>
 
-            <!-- شريط التحكم -->
             <div class="controls-bar">
                 <div class="flex gap-3">
-                    <button id="toggleFullscreen" class="btn btn-primary" title="تكبير الشاشة">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 3 6 6"/><path d="m9 21-6-6"/><path d="M21 3v6h-6"/><path d="M3 21v-6h6"/></svg>
+                    <button id="toggleFullscreen" class="btn btn-primary">
                         ملء الشاشة
                     </button>
-                    <button id="refreshStream" class="btn btn-outline" title="تحديث">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
-                        تحديث القناة
+                    <button id="refreshStream" class="btn btn-outline bg-slate-800 px-4 py-2 rounded-lg text-sm">
+                        تحديث
                     </button>
                 </div>
-                <div class="hidden sm:block text-slate-400 text-sm">
-                    beIN Sports 3 HD
+                <div id="syncStatus" class="text-slate-500 text-xs flex items-center gap-1">
+                    <span id="statusIcon">●</span> <span id="statusText">جاري الاتصال بالسحابة...</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="p-4 bg-slate-950 text-center text-slate-500 text-xs">
-        &copy; 2026 جميع الحقوق محفوظة - منصة البث الرقمي
-    </footer>
+    <script type="module">
+        // استيراد Firebase من CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    <script>
+        // إعدادات Firebase الخاصة بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdqSX_AawoPmYayxgtDS5IfIgD_CZpwik",
+            authDomain: "give-4c3fd.firebaseapp.com",
+            projectId: "give-4c3fd",
+            storageBucket: "give-4c3fd.firebasestorage.app",
+            messagingSenderId: "163389557246",
+            appId: "1:163389557246:web:281e670062c08ba02758af",
+            measurementId: "G-4RE32MMW7E"
+        };
+
+        // تهيئة Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'live-stream-app';
+
+        // تسجيل الدخول المجهول (ضروري لاستخدام Firestore)
+        let currentUser = null;
+        signInAnonymously(auth).catch(err => console.error("Auth error:", err));
+        
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('statusText').innerText = "متصل بالسحابة";
+                document.getElementById('statusIcon').style.color = "#22c55e";
+            }
+        });
+
         const fullscreenBtn = document.getElementById('toggleFullscreen');
-        const refreshBtn = document.getElementById('refreshStream');
         const frame = document.getElementById('mainFrame');
 
-        // وظيفة تكبير الشاشة المحدثة لتفادي أخطاء السياسة
+        // وظيفة إرسال البيانات إلى Firebase
+        async function logFullscreenAction() {
+            if (!currentUser) return;
+            
+            try {
+                // حفظ الحدث في مجموعة (public/data/clicks) حسب قواعد النظام
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'fullscreen_logs'), {
+                    userId: currentUser.uid,
+                    timestamp: serverTimestamp(),
+                    action: "clicked_fullscreen",
+                    stream_url: frame.src,
+                    userAgent: navigator.userAgent
+                });
+                console.log("تم إرسال البيانات بنجاح");
+            } catch (e) {
+                console.error("خطأ في إرسال البيانات:", e);
+            }
+        }
+
+        // تكبير الشاشة + إرسال البيانات
         fullscreenBtn.addEventListener('click', () => {
+            // أولاً: إرسال البيانات للسحابة
+            logFullscreenAction();
+
+            // ثانياً: تنفيذ تكبير الشاشة
             if (!document.fullscreenElement) {
-                // نطلب ملء الشاشة للإطار مباشرة مع التأكد من وجود الأذونات
-                try {
-                    if (frame.requestFullscreen) {
-                        frame.requestFullscreen();
-                    } else if (frame.webkitRequestFullscreen) { /* Safari */
-                        frame.webkitRequestFullscreen();
-                    } else if (frame.msRequestFullscreen) { /* IE11 */
-                        frame.msRequestFullscreen();
-                    }
-                } catch (err) {
-                    console.error("تعذر تفعيل ملء الشاشة:", err);
+                if (frame.requestFullscreen) {
+                    frame.requestFullscreen();
+                } else if (frame.webkitRequestFullscreen) {
+                    frame.webkitRequestFullscreen();
                 }
             } else {
                 if (document.exitFullscreen) {
@@ -197,28 +219,11 @@
             }
         });
 
-        // تحديث البث
-        refreshBtn.addEventListener('click', () => {
-            const currentSrc = frame.src;
+        // زر التحديث
+        document.getElementById('refreshStream').addEventListener('click', () => {
+            const src = frame.src;
             frame.src = '';
-            setTimeout(() => {
-                frame.src = currentSrc;
-            }, 100);
-        });
-
-        // مراقبة تغيير حالة الشاشة لتحديث شكل الزر
-        document.addEventListener('fullscreenchange', () => {
-            if (document.fullscreenElement) {
-                fullscreenBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"/><path d="m10 14-6 6"/><path d="M20 10h-6V4"/><path d="m14 10 6-6"/></svg>
-                    تصغير الشاشة
-                `;
-            } else {
-                fullscreenBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 3 6 6"/><path d="m9 21-6-6"/><path d="M21 3v6h-6"/><path d="M3 21v-6h6"/></svg>
-                    ملء الشاشة
-                `;
-            }
+            setTimeout(() => frame.src = src, 100);
         });
     </script>
 </body>
