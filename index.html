@@ -79,27 +79,12 @@
             background-color: #1d4ed8;
         }
 
-        .live-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #ef4444;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            background-color: #ef4444;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        .status-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #334155;
+            color: #94a3b8;
         }
     </style>
 </head>
@@ -110,10 +95,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="12" x="2" y="6" rx="2"/><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.934a.5.5 0 0 0-.777-.416L16 11z"/></svg>
             <span class="font-bold text-xl">بث مباشر ذكي</span>
         </div>
-        <div class="live-indicator">
-            <span class="dot"></span>
-            مباشر
-        </div>
+        <div id="connectionBadge" class="status-badge">جاري الاتصال...</div>
     </header>
 
     <div class="main-container">
@@ -132,19 +114,18 @@
                     <button id="toggleFullscreen" class="btn btn-primary">
                         ملء الشاشة
                     </button>
-                    <button id="refreshStream" class="btn btn-outline bg-slate-800 px-4 py-2 rounded-lg text-sm">
+                    <button id="refreshStream" class="btn btn-outline bg-slate-800 px-4 py-2 rounded-lg text-sm text-white">
                         تحديث
                     </button>
                 </div>
-                <div id="syncStatus" class="text-slate-500 text-xs flex items-center gap-1">
-                    <span id="statusIcon">●</span> <span id="statusText">جاري الاتصال بالسحابة...</span>
+                <div class="text-slate-500 text-xs" id="logStatus">
+                    سجل الأحداث: جاهز
                 </div>
             </div>
         </div>
     </div>
 
     <script type="module">
-        // استيراد Firebase من CDN
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -160,52 +141,74 @@
             measurementId: "G-4RE32MMW7E"
         };
 
-        // تهيئة Firebase
+        // تهيئة النظام
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'live-stream-app';
-
-        // تسجيل الدخول المجهول (ضروري لاستخدام Firestore)
-        let currentUser = null;
-        signInAnonymously(auth).catch(err => console.error("Auth error:", err));
         
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('statusText').innerText = "متصل بالسحابة";
-                document.getElementById('statusIcon').style.color = "#22c55e";
+        // الحصول على App ID أو استخدام افتراضي
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'live-stream-logger';
+
+        let user = null;
+
+        // تسجيل الدخول المجهول إلزامي قبل أي عملية Firestore
+        const initAuth = async () => {
+            try {
+                const result = await signInAnonymously(auth);
+                user = result.user;
+                document.getElementById('connectionBadge').innerText = "متصل بالسحابة";
+                document.getElementById('connectionBadge').style.backgroundColor = "#166534";
+                document.getElementById('connectionBadge').style.color = "#bbf7d0";
+            } catch (error) {
+                console.error("Auth Error:", error);
+                document.getElementById('connectionBadge').innerText = "خطأ في الاتصال";
             }
-        });
+        };
+
+        initAuth();
 
         const fullscreenBtn = document.getElementById('toggleFullscreen');
         const frame = document.getElementById('mainFrame');
+        const logStatus = document.getElementById('logStatus');
 
-        // وظيفة إرسال البيانات إلى Firebase
-        async function logFullscreenAction() {
-            if (!currentUser) return;
-            
+        // وظيفة إرسال البيانات (تتبع القواعد الصارمة للمسارات)
+        async function sendLogToFirebase() {
+            if (!user) {
+                console.log("لم يتم تسجيل الدخول بعد");
+                return;
+            }
+
             try {
-                // حفظ الحدث في مجموعة (public/data/clicks) حسب قواعد النظام
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'fullscreen_logs'), {
-                    userId: currentUser.uid,
+                // القاعدة 1: المسار يجب أن يبدأ بـ /artifacts/{appId}/public/data/
+                const collectionPath = collection(db, 'artifacts', appId, 'public', 'data', 'fullscreen_clicks');
+                
+                await addDoc(collectionPath, {
                     timestamp: serverTimestamp(),
-                    action: "clicked_fullscreen",
-                    stream_url: frame.src,
-                    userAgent: navigator.userAgent
+                    userId: user.uid,
+                    action: "fullscreen_opened",
+                    url: frame.src,
+                    screenResolution: `${window.innerWidth}x${window.innerHeight}`
                 });
-                console.log("تم إرسال البيانات بنجاح");
-            } catch (e) {
-                console.error("خطأ في إرسال البيانات:", e);
+                
+                logStatus.innerText = "تم تسجيل الحدث بنجاح";
+                logStatus.style.color = "#4ade80";
+                setTimeout(() => {
+                    logStatus.innerText = "سجل الأحداث: جاهز";
+                    logStatus.style.color = "";
+                }, 3000);
+            } catch (err) {
+                console.error("Firebase Error:", err);
+                logStatus.innerText = "فشل في تسجيل الحدث";
+                logStatus.style.color = "#f87171";
             }
         }
 
-        // تكبير الشاشة + إرسال البيانات
+        // التعامل مع الزر
         fullscreenBtn.addEventListener('click', () => {
-            // أولاً: إرسال البيانات للسحابة
-            logFullscreenAction();
+            // إرسال البيانات فوراً
+            sendLogToFirebase();
 
-            // ثانياً: تنفيذ تكبير الشاشة
+            // تنفيذ ملء الشاشة
             if (!document.fullscreenElement) {
                 if (frame.requestFullscreen) {
                     frame.requestFullscreen();
