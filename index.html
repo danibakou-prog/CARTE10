@@ -3,290 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة التفعيل الملكية</title>
-    
-    <!-- تحميل الخطوط الملكية -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap" rel="stylesheet">
-    
+    <title>مشغل البث المباشر - وضع ملء الشاشة</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
     <style>
-        :root {
-            --gold-primary: #bf953f;
-            --gold-light: #fcf6ba;
-            --gold-dark: #8a642d;
-            --gold-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 45%, #b38728 55%, #aa771c 100%);
-            --luxury-shadow: 0 50px 100px -20px rgba(0,0,0,0.12), 0 30px 60px -30px rgba(0,0,0,0.15);
+        body {
+            background-color: #020617;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        body {
-            font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
-            background: #f8f9fa;
-            /* نمط خلفية هندسي دقيق جداً */
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(191, 149, 63, 0.03) 0%, transparent 80%),
-                linear-gradient(rgba(220, 220, 220, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(220, 220, 220, 0.05) 1px, transparent 1px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
-            min-height: 100vh;
+        .main-container {
+            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0;
-            padding: 24px;
+            padding: 20px;
         }
 
-        .main-card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: var(--luxury-shadow);
+        .player-card {
+            background: #1e293b;
             width: 100%;
-            max-width: 500px;
-            position: relative;
-            transform-style: preserve-3d;
-            perspective: 1000px;
-        }
-
-        .gold-accent-line {
-            height: 6px;
-            background: var(--gold-gradient);
-            border-radius: 40px 40px 0 0;
-        }
-
-        /* تصميم منطقة الرمز بشكل مخملي */
-        .token-display-box {
-            background: #1a1a1a;
-            position: relative;
+            max-width: 1000px;
+            border-radius: 16px;
             overflow: hidden;
-            border-radius: 24px;
-            transition: all 0.5s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
         }
 
-        .token-display-box::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(252, 246, 186, 0.1) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .token-display-box:hover::after {
-            opacity: 1;
-        }
-
-        .token-text {
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-family: 'Courier New', Courier, monospace;
-            letter-spacing: 2px;
-        }
-
-        .copy-trigger {
-            background: var(--gold-gradient);
+        /* حاوية الفيديو */
+        #videoContainer {
             position: relative;
-            z-index: 10;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background: #000;
         }
 
-        .copy-trigger:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 30px -5px rgba(138, 100, 45, 0.4);
-        }
-
-        .copy-trigger::before {
-            content: '';
+        #videoContainer iframe {
             position: absolute;
-            top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: 0.5s;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
-        .copy-trigger:hover::before {
-            left: 100%;
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #0f172a;
         }
 
-        .instruction-pill {
-            background: #ffffff;
-            border: 1px solid #f0f0f0;
-            transition: all 0.3s ease;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
         }
 
-        .instruction-pill:hover {
-            border-color: var(--gold-primary);
-            transform: translateX(-5px);
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
         }
 
-        /* أنيميشن النجاح */
-        @keyframes ripple {
-            to { transform: scale(4); opacity: 0; }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
         }
 
-        .ripple-effect {
-            position: absolute;
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #475569;
+            color: #cbd5e1;
+        }
+
+        .btn-outline:hover {
+            background-color: #334155;
+            border-color: #64748b;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ef4444;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            transform: scale(0);
-            animation: ripple 0.6s linear;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-    <div class="main-card rounded-[3rem] p-1">
-        <div class="gold-accent-line"></div>
-        
-        <div class="bg-white rounded-[2.8rem] overflow-hidden">
-            <!-- Header Section -->
-            <div class="px-10 pt-10 pb-6 flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-black flex items-center justify-center shadow-lg transform -rotate-6">
-                        <i data-lucide="crown" class="w-7 h-7 text-[#fcf6ba]"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-black text-gray-900 tracking-tight">نظام النخبة</h1>
-                        <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                            Elite Member Access
-                        </p>
-                    </div>
-                </div>
-                <div class="text-left">
-                    <div class="text-[9px] font-bold text-gray-400 uppercase">Status</div>
-                    <div class="text-[11px] font-black text-emerald-600">نشط ومؤمن</div>
-                </div>
+    <!-- Header -->
+    <header class="p-4 bg-slate-950 flex justify-between items-center px-8 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.934a.5.5 0 0 0-.777-.416L16 11z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+            <span class="font-bold text-xl tracking-tight">البث المباشر المتقدم</span>
+        </div>
+        <div class="live-indicator">
+            <span class="dot"></span>
+            مباشر الآن
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="player-card">
+            <!-- حاوية الفيديو -->
+            <div id="videoContainer">
+                <iframe 
+                    id="mainFrame"
+                    src="https://testjojoo.s3.eu-north-1.amazonaws.com/bein3.html" 
+                    allow="autoplay; encrypted-media; fullscreen" 
+                    allowfullscreen="true"
+                    webkitallowfullscreen="true" 
+                    mozallowfullscreen="true"
+                    title="Live Stream">
+                </iframe>
             </div>
 
-            <!-- Content Body -->
-            <div class="px-10 py-4">
-                
-                <!-- Instruction Steps -->
-                <div class="space-y-3 mb-10">
-                    <div class="instruction-pill p-4 rounded-2xl flex items-center gap-4 group">
-                        <div class="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-400 group-hover:bg-amber-50 group-hover:text-amber-600 transition-colors">01</div>
-                        <p class="text-xs font-bold text-gray-600">انسخ الرمز الملكي الموضح بالأسفل بنقرة واحدة.</p>
-                    </div>
-                    <div class="instruction-pill p-4 rounded-2xl flex items-center gap-4 group">
-                        <div class="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-400 group-hover:bg-amber-50 group-hover:text-amber-600 transition-colors">02</div>
-                        <p class="text-xs font-bold text-gray-600">توجه إلى "مركز التوثيق" داخل التطبيق الخاص بك.</p>
-                    </div>
-                </div>
-
-                <!-- Token Area -->
-                <div class="relative group">
-                    <div class="flex justify-between items-center mb-3 px-2">
-                        <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest">Authentication Token</span>
-                        <div class="flex gap-1">
-                            <div class="w-1 h-1 rounded-full bg-gray-200"></div>
-                            <div class="w-1 h-1 rounded-full bg-gray-200"></div>
-                            <div class="w-1 h-1 rounded-full bg-amber-400"></div>
-                        </div>
-                    </div>
-
-                    <div id="copyArea" class="token-display-box p-12 flex flex-col items-center justify-center cursor-pointer shadow-2xl">
-                        <code class="token-text text-3xl md:text-5xl font-black mb-2">GLD-882-TRX-Q9</code>
-                        <div class="text-[9px] text-gray-500 font-bold tracking-[0.4em] uppercase opacity-60">Verified Premium Asset</div>
-                    </div>
-
-                    <!-- Floating Copy Button -->
-                    <button id="floatingBtn" class="copy-trigger absolute -bottom-6 left-1/2 -translate-x-1/2 px-10 py-4 rounded-2xl flex items-center gap-3 shadow-xl">
-                        <i data-lucide="copy" class="w-4 h-4 text-[#4a3701]"></i>
-                        <span class="text-xs font-black text-[#4a3701]">نسخ الرمز الآن</span>
+            <!-- شريط التحكم -->
+            <div class="controls-bar">
+                <div class="flex gap-3">
+                    <button id="toggleFullscreen" class="btn btn-primary" title="تكبير الشاشة">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 3 6 6"/><path d="m9 21-6-6"/><path d="M21 3v6h-6"/><path d="M3 21v-6h6"/></svg>
+                        ملء الشاشة
+                    </button>
+                    <button id="refreshStream" class="btn btn-outline" title="تحديث">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+                        تحديث القناة
                     </button>
                 </div>
-            </div>
-
-            <!-- Footer Section -->
-            <div class="mt-16 px-10 pb-10">
-                <div class="pt-8 border-t border-gray-100 flex justify-between items-center">
-                    <div class="flex flex-col">
-                        <span class="text-[9px] font-bold text-gray-400 uppercase mb-1">Security Protocol</span>
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
-                            <span class="text-[10px] font-black text-gray-800">تشفير AES-256 بت نشط</span>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-2 rounded-xl flex items-center gap-2">
-                        <i data-lucide="clock" class="w-3.5 h-3.5 text-gray-400"></i>
-                        <span id="timestamp" class="text-[10px] font-bold text-gray-500 tracking-tighter">--:--:--</span>
-                    </div>
+                <div class="hidden sm:block text-slate-400 text-sm">
+                    beIN Sports 3 HD
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Success Toast -->
-    <div id="successToast" class="fixed bottom-12 left-1/2 -translate-x-1/2 translate-y-40 opacity-0 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] z-50">
-        <div class="bg-black text-white px-8 py-5 rounded-[2rem] shadow-2xl flex items-center gap-5 min-w-[320px]">
-            <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500">
-                <i data-lucide="sparkles" class="w-5 h-5"></i>
-            </div>
-            <div>
-                <p class="font-black text-sm">اكتمل النسخ بنجاح</p>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Token Added to Clipboard</p>
-            </div>
-        </div>
-    </div>
+    <!-- Footer -->
+    <footer class="p-4 bg-slate-950 text-center text-slate-500 text-xs">
+        &copy; 2026 جميع الحقوق محفوظة - منصة البث الرقمي
+    </footer>
 
     <script>
-        lucide.createIcons();
+        const fullscreenBtn = document.getElementById('toggleFullscreen');
+        const refreshBtn = document.getElementById('refreshStream');
+        const frame = document.getElementById('mainFrame');
 
-        const copyArea = document.getElementById('copyArea');
-        const floatingBtn = document.getElementById('floatingBtn');
-        const toast = document.getElementById('successToast');
-        const token = "GLD-882-TRX-Q9";
-
-        // تحديث الوقت المباشر للتأثير الاحترافي
-        function updateTime() {
-            const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2, '0') + ":" + 
-                           now.getMinutes().toString().padStart(2, '0') + ":" + 
-                           now.getSeconds().toString().padStart(2, '0');
-            document.getElementById('timestamp').innerText = timeStr;
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
-
-        async function handleCopy(e) {
-            try {
-                await navigator.clipboard.writeText(token);
-                
-                // تأثير التموج (Ripple Effect)
-                const ripple = document.createElement('span');
-                ripple.classList.add('ripple-effect');
-                const rect = copyArea.getBoundingClientRect();
-                ripple.style.left = (e.clientX - rect.left) + 'px';
-                ripple.style.top = (e.clientY - rect.top) + 'px';
-                ripple.style.width = ripple.style.height = Math.max(rect.width, rect.height) + 'px';
-                copyArea.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 600);
-
-                // إظهار التنبيه
-                toast.classList.remove('translate-y-40', 'opacity-0');
-                
-                setTimeout(() => {
-                    toast.classList.add('translate-y-40', 'opacity-0');
-                }, 3000);
-
-            } catch (err) {
-                // الطريقة الاحتياطية
-                const textArea = document.createElement("textarea");
-                textArea.value = token;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
+        // وظيفة تكبير الشاشة المحدثة لتفادي أخطاء السياسة
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                // نطلب ملء الشاشة للإطار مباشرة مع التأكد من وجود الأذونات
+                try {
+                    if (frame.requestFullscreen) {
+                        frame.requestFullscreen();
+                    } else if (frame.webkitRequestFullscreen) { /* Safari */
+                        frame.webkitRequestFullscreen();
+                    } else if (frame.msRequestFullscreen) { /* IE11 */
+                        frame.msRequestFullscreen();
+                    }
+                } catch (err) {
+                    console.error("تعذر تفعيل ملء الشاشة:", err);
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
             }
-        }
+        });
 
-        copyArea.addEventListener('click', handleCopy);
-        floatingBtn.addEventListener('click', handleCopy);
+        // تحديث البث
+        refreshBtn.addEventListener('click', () => {
+            const currentSrc = frame.src;
+            frame.src = '';
+            setTimeout(() => {
+                frame.src = currentSrc;
+            }, 100);
+        });
+
+        // مراقبة تغيير حالة الشاشة لتحديث شكل الزر
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fullscreenBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"/><path d="m10 14-6 6"/><path d="M20 10h-6V4"/><path d="m14 10 6-6"/></svg>
+                    تصغير الشاشة
+                `;
+            } else {
+                fullscreenBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 3 6 6"/><path d="m9 21-6-6"/><path d="M21 3v6h-6"/><path d="M3 21v-6h6"/></svg>
+                    ملء الشاشة
+                `;
+            }
+        });
     </script>
 </body>
 </html>
