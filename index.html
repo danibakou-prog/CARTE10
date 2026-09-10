@@ -3,230 +3,767 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مشغل البث المباشر - متصل بالسحابة</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>عدّاد ورق 260 غرام</title>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
-        body {
-            background-color: #020617;
-            color: #f8fafc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .main-container {
-            flex-grow: 1;
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 18px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 16px 40px;
+        }
+
+        /* ===== PRODUCT CARD ===== */
+        .product-card {
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,210,255,0.05) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .product-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 48px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .product-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .product-weight {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== COUNTER ===== */
+        .counter-display {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 10px;
+        }
+
+        .counter-number {
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            transition: transform 0.3s;
+        }
+
+        .counter-number.bump {
+            animation: bump 0.3s ease;
+        }
+
+        @keyframes bump {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .counter-label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .buttons-row {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .scan-btn {
+            flex: 1;
+            max-width: 160px;
+            padding: 16px 10px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-family: inherit;
+            color: #fff;
+        }
+
+        .scan-btn:active {
+            transform: scale(0.93);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            box-shadow: 0 8px 30px rgba(0, 176, 155, 0.35);
+        }
+
+        .btn-add:hover {
+            box-shadow: 0 12px 40px rgba(0, 176, 155, 0.5);
+        }
+
+        .btn-remove {
+            background: linear-gradient(135deg, #eb3349, #f45c43);
+            box-shadow: 0 8px 30px rgba(235, 51, 73, 0.35);
+        }
+
+        .btn-remove:hover {
+            box-shadow: 0 12px 40px rgba(235, 51, 73, 0.5);
+        }
+
+        .btn-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        /* ===== CODES LIST ===== */
+        .list-section {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
             padding: 20px;
         }
 
-        .player-card {
-            background: #1e293b;
-            width: 100%;
-            max-width: 1000px;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid #334155;
-        }
-
-        #videoContainer {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%;
-            background: #000;
-        }
-
-        #videoContainer iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .controls-bar {
+        .list-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            background: #0f172a;
+            margin-bottom: 16px;
         }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 8px;
+        .list-title {
+            font-size: 1.1rem;
             font-weight: 600;
-            transition: all 0.2s;
-            cursor: pointer;
-            border: none;
         }
 
-        .btn-primary {
-            background-color: #2563eb;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #1d4ed8;
-        }
-
-        .status-badge {
-            font-size: 10px;
-            padding: 2px 8px;
+        .clear-btn {
+            background: rgba(235, 51, 73, 0.2);
+            border: 1px solid rgba(235, 51, 73, 0.4);
+            color: #f45c43;
+            padding: 6px 14px;
             border-radius: 10px;
-            background: #334155;
-            color: #94a3b8;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .clear-btn:hover {
+            background: rgba(235, 51, 73, 0.4);
+        }
+
+        .codes-list {
+            max-height: 350px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .codes-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .codes-list::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+
+        .code-item {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+            direction: ltr;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .code-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: #00d2ff;
+            letter-spacing: 1px;
+        }
+
+        .code-time {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .code-delete {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .code-delete:hover {
+            color: #f45c43;
+            background: rgba(235, 51, 73, 0.15);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255,255,255,0.25);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .modal-subtitle {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 20px;
+        }
+
+        #reader {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        #reader video {
+            border-radius: 16px;
+        }
+
+        .manual-input {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .manual-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            direction: ltr;
+            outline: none;
+        }
+
+        .manual-input input:focus {
+            border-color: #00d2ff;
+        }
+
+        .manual-input input::placeholder {
+            color: rgba(255,255,255,0.25);
+        }
+
+        .manual-submit {
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .close-modal {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            padding: 14px 24px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            animation: toastIn 0.4s ease, toastOut 0.4s ease 2.6s forwards;
+            white-space: nowrap;
+            backdrop-filter: blur(20px);
+            pointer-events: auto;
+        }
+
+        .toast-success {
+            background: rgba(0, 176, 155, 0.9);
+            color: #fff;
+            box-shadow: 0 8px 30px rgba(0, 176, 155, 0.3);
+        }
+
+        .toast-error {
+            background: rgba(235, 51, 73, 0.9);
+            color: #fff;
+            box-shadow: 0 8px 30px rgba(235, 51, 73, 0.3);
+        }
+
+        .toast-info {
+            background: rgba(58, 123, 213, 0.9);
+            color: #fff;
+            box-shadow: 0 8px 30px rgba(58, 123, 213, 0.3);
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 380px) {
+            .counter-number { font-size: 3.5rem; }
+            .product-icon { width: 80px; height: 80px; font-size: 38px; }
         }
     </style>
 </head>
 <body>
 
-    <header class="p-4 bg-slate-950 flex justify-between items-center px-8 border-b border-slate-800">
-        <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="12" x="2" y="6" rx="2"/><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.934a.5.5 0 0 0-.777-.416L16 11z"/></svg>
-            <span class="font-bold text-xl">بث مباشر ذكي</span>
-        </div>
-        <div id="connectionBadge" class="status-badge">جاري الاتصال...</div>
-    </header>
+    <!-- HEADER -->
+    <div class="header">
+        <h1>📦 نظام عدّاد المنتجات</h1>
+    </div>
 
-    <div class="main-container">
-        <div class="player-card">
-            <div id="videoContainer">
-                <iframe 
-                    id="mainFrame"
-                    src="https://testjojoo.s3.eu-north-1.amazonaws.com/bein3.html" 
-                    allow="autoplay; encrypted-media; fullscreen" 
-                    allowfullscreen="true">
-                </iframe>
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- MAIN -->
+    <div class="container">
+
+        <!-- PRODUCT CARD -->
+        <div class="product-card">
+            <div class="product-icon">📄</div>
+            <div class="product-name">ورق طباعة</div>
+            <div class="product-weight">260 غرام / م²</div>
+
+            <div class="counter-display">
+                <div class="counter-number" id="counter">0</div>
+                <div class="counter-label">العدد المسجّل</div>
             </div>
 
-            <div class="controls-bar">
-                <div class="flex gap-3">
-                    <button id="toggleFullscreen" class="btn btn-primary">
-                        ملء الشاشة
-                    </button>
-                    <button id="refreshStream" class="btn btn-outline bg-slate-800 px-4 py-2 rounded-lg text-sm text-white">
-                        تحديث
-                    </button>
-                </div>
-                <div class="text-slate-500 text-xs" id="logStatus">
-                    سجل الأحداث: جاهز
+            <div class="buttons-row">
+                <button class="scan-btn btn-add" onclick="openScanner('add')">
+                    <span class="btn-icon">＋</span>
+                    <span>إضافة</span>
+                </button>
+                <button class="scan-btn btn-remove" onclick="openScanner('remove')">
+                    <span class="btn-icon">－</span>
+                    <span>حذف</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- CODES LIST -->
+        <div class="list-section">
+            <div class="list-header">
+                <span class="list-title">📋 الأرقام التسلسلية</span>
+                <button class="clear-btn" onclick="clearAll()">مسح الكل</button>
+            </div>
+            <div class="codes-list" id="codesList">
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <div>لا توجد أرقام مسجّلة بعد</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    <!-- SCANNER MODAL -->
+    <div class="modal-overlay" id="scannerModal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">مسح الرقم التسلسلي</div>
+            <div class="modal-subtitle" id="modalSubtitle">وجّه الكاميرا نحو الباركود أو الرقم التسلسلي</div>
 
-        // إعدادات Firebase الخاصة بك
-        const firebaseConfig = {
-            apiKey: "AIzaSyAdqSX_AawoPmYayxgtDS5IfIgD_CZpwik",
-            authDomain: "give-4c3fd.firebaseapp.com",
-            projectId: "give-4c3fd",
-            storageBucket: "give-4c3fd.firebasestorage.app",
-            messagingSenderId: "163389557246",
-            appId: "1:163389557246:web:281e670062c08ba02758af",
-            measurementId: "G-4RE32MMW7E"
-        };
+            <div id="reader"></div>
 
-        // تهيئة النظام
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        
-        // الحصول على App ID أو استخدام افتراضي
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'live-stream-logger';
+            <div style="color: rgba(255,255,255,0.3); font-size: 0.8rem; margin-bottom: 12px;">— أو أدخل الرقم يدوياً —</div>
 
-        let user = null;
+            <div class="manual-input">
+                <input type="text" id="manualCode" placeholder="أدخل الرقم التسلسلي" />
+                <button class="manual-submit" onclick="handleManualInput()">تأكيد</button>
+            </div>
 
-        // تسجيل الدخول المجهول إلزامي قبل أي عملية Firestore
-        const initAuth = async () => {
-            try {
-                const result = await signInAnonymously(auth);
-                user = result.user;
-                document.getElementById('connectionBadge').innerText = "متصل بالسحابة";
-                document.getElementById('connectionBadge').style.backgroundColor = "#166534";
-                document.getElementById('connectionBadge').style.color = "#bbf7d0";
-            } catch (error) {
-                console.error("Auth Error:", error);
-                document.getElementById('connectionBadge').innerText = "خطأ في الاتصال";
-            }
-        };
+            <button class="close-modal" onclick="closeScanner()">إغلاق الكاميرا</button>
+        </div>
+    </div>
 
-        initAuth();
+    <script>
+        // ===== STATE =====
+        let codes = JSON.parse(localStorage.getItem('paper260_codes') || '[]');
+        let currentMode = 'add'; // 'add' or 'remove'
+        let html5QrCode = null;
+        let isScanning = false;
 
-        const fullscreenBtn = document.getElementById('toggleFullscreen');
-        const frame = document.getElementById('mainFrame');
-        const logStatus = document.getElementById('logStatus');
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            renderList();
+            updateCounter();
+        });
 
-        // وظيفة إرسال البيانات (تتبع القواعد الصارمة للمسارات)
-        async function sendLogToFirebase() {
-            if (!user) {
-                console.log("لم يتم تسجيل الدخول بعد");
+        // ===== SAVE =====
+        function saveCodes() {
+            localStorage.setItem('paper260_codes', JSON.stringify(codes));
+        }
+
+        // ===== COUNTER =====
+        function updateCounter() {
+            const el = document.getElementById('counter');
+            el.textContent = codes.length;
+            el.classList.remove('bump');
+            void el.offsetWidth;
+            el.classList.add('bump');
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ===== RENDER LIST =====
+        function renderList() {
+            const list = document.getElementById('codesList');
+            if (codes.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div>لا توجد أرقام مسجّلة بعد</div>
+                    </div>`;
                 return;
             }
 
-            try {
-                // القاعدة 1: المسار يجب أن يبدأ بـ /artifacts/{appId}/public/data/
-                const collectionPath = collection(db, 'artifacts', appId, 'public', 'data', 'fullscreen_clicks');
-                
-                await addDoc(collectionPath, {
-                    timestamp: serverTimestamp(),
-                    userId: user.uid,
-                    action: "fullscreen_opened",
-                    url: frame.src,
-                    screenResolution: `${window.innerWidth}x${window.innerHeight}`
-                });
-                
-                logStatus.innerText = "تم تسجيل الحدث بنجاح";
-                logStatus.style.color = "#4ade80";
-                setTimeout(() => {
-                    logStatus.innerText = "سجل الأحداث: جاهز";
-                    logStatus.style.color = "";
-                }, 3000);
-            } catch (err) {
-                console.error("Firebase Error:", err);
-                logStatus.innerText = "فشل في تسجيل الحدث";
-                logStatus.style.color = "#f87171";
+            list.innerHTML = codes.map((item, index) => `
+                <div class="code-item">
+                    <div>
+                        <div class="code-text">${item.code}</div>
+                        <div class="code-time">${item.time}</div>
+                    </div>
+                    <button class="code-delete" onclick="deleteCode(${index})" title="حذف">✕</button>
+                </div>
+            `).join('');
+        }
+
+        // ===== ADD CODE =====
+        function addCode(code) {
+            code = code.trim();
+            if (!code) return;
+
+            const exists = codes.find(c => c.code === code);
+            if (exists) {
+                showToast('⚠️ هذا الرقم موجود بالفعل!', 'error');
+                return;
+            }
+
+            const now = new Date();
+            const timeStr = now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+            codes.push({ code, time: timeStr });
+            saveCodes();
+            renderList();
+            updateCounter();
+            showToast('✅ تمت الإضافة بنجاح', 'success');
+        }
+
+        // ===== REMOVE CODE =====
+        function removeCode(code) {
+            code = code.trim();
+            if (!code) return;
+
+            const index = codes.findIndex(c => c.code === code);
+            if (index === -1) {
+                showToast('⚠️ هذا الرقم غير موجود في القائمة!', 'error');
+                return;
+            }
+
+            codes.splice(index, 1);
+            saveCodes();
+            renderList();
+            updateCounter();
+            showToast('🗑️ تم الحذف بنجاح', 'success');
+        }
+
+        // ===== DELETE SINGLE =====
+        function deleteCode(index) {
+            codes.splice(index, 1);
+            saveCodes();
+            renderList();
+            updateCounter();
+            showToast('🗑️ تم الحذف', 'info');
+        }
+
+        // ===== CLEAR ALL =====
+        function clearAll() {
+            if (codes.length === 0) return;
+            if (confirm('هل أنت متأكد من حذف جميع الأرقام؟')) {
+                codes = [];
+                saveCodes();
+                renderList();
+                updateCounter();
+                showToast('🗑️ تم مسح جميع الأرقام', 'info');
             }
         }
 
-        // التعامل مع الزر
-        fullscreenBtn.addEventListener('click', () => {
-            // إرسال البيانات فوراً
-            sendLogToFirebase();
+        // ===== SCANNER =====
+        function openScanner(mode) {
+            currentMode = mode;
+            const modal = document.getElementById('scannerModal');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
 
-            // تنفيذ ملء الشاشة
-            if (!document.fullscreenElement) {
-                if (frame.requestFullscreen) {
-                    frame.requestFullscreen();
-                } else if (frame.webkitRequestFullscreen) {
-                    frame.webkitRequestFullscreen();
-                }
+            if (mode === 'add') {
+                title.textContent = '➕ إضافة رقم تسلسلي';
+                subtitle.textContent = 'وجّه الكاميرا نحو الباركود أو أدخل الرقم يدوياً';
             } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
+                title.textContent = '➖ حذف رقم تسلسلي';
+                subtitle.textContent = 'وجّه الكاميرا نحو الباركود أو أدخل الرقم يدوياً';
             }
+
+            modal.classList.add('active');
+            document.getElementById('manualCode').value = '';
+
+            startCamera();
+        }
+
+        function closeScanner() {
+            const modal = document.getElementById('scannerModal');
+            modal.classList.remove('active');
+            stopCamera();
+        }
+
+        function startCamera() {
+            if (isScanning) return;
+
+            html5QrCode = new Html5Qrcode("reader");
+
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 100 },
+                aspectRatio: 1.0
+            };
+
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                () => {} // ignore scan failures
+            ).then(() => {
+                isScanning = true;
+            }).catch(err => {
+                console.error("Camera error:", err);
+                showToast('⚠️ تعذّر فتح الكاميرا - أدخل الرقم يدوياً', 'error');
+            });
+        }
+
+        function stopCamera() {
+            if (html5QrCode && isScanning) {
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    html5QrCode.clear();
+                }).catch(err => {
+                    console.error("Stop error:", err);
+                    isScanning = false;
+                });
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            stopCamera();
+
+            if (currentMode === 'add') {
+                addCode(decodedText);
+            } else {
+                removeCode(decodedText);
+            }
+
+            setTimeout(() => closeScanner(), 500);
+        }
+
+        function handleManualInput() {
+            const input = document.getElementById('manualCode');
+            const code = input.value.trim();
+
+            if (!code) {
+                showToast('⚠️ الرجاء إدخال رقم تسلسلي', 'error');
+                return;
+            }
+
+            stopCamera();
+
+            if (currentMode === 'add') {
+                addCode(code);
+            } else {
+                removeCode(code);
+            }
+
+            setTimeout(() => closeScanner(), 500);
+        }
+
+        // Enter key for manual input
+        document.getElementById('manualCode').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleManualInput();
         });
 
-        // زر التحديث
-        document.getElementById('refreshStream').addEventListener('click', () => {
-            const src = frame.src;
-            frame.src = '';
-            setTimeout(() => frame.src = src, 100);
+        // Close modal on overlay click
+        document.getElementById('scannerModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeScanner();
         });
     </script>
 </body>
