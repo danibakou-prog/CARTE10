@@ -3,604 +3,548 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عدّاد المنتجات الاحترافي</title>
+    <title>عدّاد المنتجات</title>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
-            --gold: #D4AF37;
-            --gold-light: #E8C547;
-            --gold-dark: #B8941F;
-            --gold-soft: rgba(212, 175, 55, 0.12);
-            --gold-glow: rgba(212, 175, 55, 0.25);
-            --white: #FFFFFF;
-            --off-white: #FAFAFA;
-            --cream: #F5F1E8;
-            --ink: #1a1a1a;
-            --ink-soft: #3a3a3a;
-            --ink-muted: #6b6b6b;
-            --ink-faint: #9a9a9a;
-            --line: #E8E4D9;
-            --line-soft: #F0ECE1;
-            --success: #16a34a;
-            --success-light: #22c55e;
-            --success-soft: rgba(22, 163, 74, 0.1);
-            --danger: #dc2626;
-            --danger-light: #ef4444;
-            --danger-soft: rgba(220, 38, 38, 0.1);
+            --primary: #a855f7;
+            --primary-dark: #7c3aed;
+            --accent: #06b6d4;
+            --accent-dark: #0891b2;
+            --pink: #ec4899;
+            --success: #10b981;
+            --success-dark: #059669;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
             --warning: #f59e0b;
-            --warning-light: #fbbf24;
-            --warning-soft: rgba(245, 158, 11, 0.12);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.08);
-            --shadow-gold: 0 10px 30px rgba(212, 175, 55, 0.25);
+            --gold: #fbbf24;
+            --bg-1: #0a0a1a;
+            --bg-2: #1a1a2e;
+            --bg-3: #16213e;
+            --text: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+            --text-muted: rgba(255, 255, 255, 0.35);
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-            background: var(--off-white);
-            background-image: 
-                radial-gradient(circle at 10% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 90% 100%, rgba(212, 175, 55, 0.05) 0%, transparent 40%);
+            background: 
+                radial-gradient(circle at 20% 10%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2), var(--bg-3));
             min-height: 100vh;
-            color: var(--ink);
+            color: var(--text);
             overflow-x: hidden;
             position: relative;
-            padding-bottom: 80px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
         }
 
         /* ===== HEADER ===== */
         .header {
-            background: var(--white);
-            border-bottom: 2px solid var(--gold);
-            padding: 16px 20px;
+            background: rgba(10, 10, 26, 0.7);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 14px 18px;
             position: sticky;
             top: 0;
             z-index: 100;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            box-shadow: var(--shadow-sm);
+            gap: 10px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
         .header h1 {
-            font-size: 1.3rem;
+            font-size: 1.15rem;
             font-weight: 800;
-            color: var(--ink);
-            letter-spacing: 0.3px;
+            background: linear-gradient(90deg, #a855f7, #ec4899, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            flex: 1;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            color: #fff;
+            font-size: 1.15rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .icon-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s;
+        }
+
+        .icon-btn:hover::before {
+            left: 100%;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.93);
+        }
+
+        .icon-btn.danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(248, 113, 113, 0.15));
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .icon-btn.danger:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(248, 113, 113, 0.25));
+            box-shadow: 0 8px 22px rgba(239, 68, 68, 0.25);
+        }
+
+        .icon-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--pink));
+            border-color: transparent;
+            box-shadow: 
+                0 6px 18px rgba(168, 85, 247, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .icon-btn.primary:hover {
+            box-shadow: 
+                0 10px 26px rgba(168, 85, 247, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== PRODUCTS LIST (VERTICAL) ===== */
+        .products-section {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 18px 16px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .products-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding: 0 4px;
+        }
+
+        .products-section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #fff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .header h1 .gold-accent {
-            color: var(--gold);
+        .products-section-title .badge {
+            background: linear-gradient(135deg, var(--primary), var(--pink));
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 10px;
+            min-width: 24px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(168, 85, 247, 0.3);
         }
 
-        .icon-btn {
-            background: var(--white);
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            font-size: 1.3rem;
-            cursor: pointer;
+        .sort-indicator {
+            font-size: 0.75rem;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
-            justify-content: center;
-            transition: all 0.25s ease;
-            font-weight: 700;
+            gap: 4px;
         }
 
-        .icon-btn:hover {
-            background: var(--gold);
-            color: var(--white);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-gold);
+        .products-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .icon-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* ===== PRODUCT SELECTOR (DROPDOWN) ===== */
-        .product-selector {
-            background: var(--white);
-            padding: 16px 20px;
-            position: sticky;
-            top: 76px;
-            z-index: 99;
-            border-bottom: 1px solid var(--line-soft);
-        }
-
-        .selector-wrapper {
-            position: relative;
-            max-width: 520px;
-            margin: 0 auto;
-        }
-
-        .selector-trigger {
-            width: 100%;
-            background: var(--white);
-            border: 2px solid var(--line);
-            border-radius: 16px;
+        .product-card-mini {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
             padding: 14px 16px;
             display: flex;
             align-items: center;
             gap: 14px;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            overflow: hidden;
+            animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .selector-trigger:hover {
-            border-color: var(--gold);
-            box-shadow: var(--shadow-sm);
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .selector-trigger.open {
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px var(--gold-soft);
+        .product-card-mini::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 3px; height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--pink));
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        .selector-icon {
+        .product-card-mini:hover {
+            background: rgba(255, 255, 255, 0.09);
+            transform: translateX(-4px);
+            border-color: rgba(168, 85, 247, 0.25);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-card-mini:hover::before {
+            opacity: 1;
+        }
+
+        .product-card-mini.active {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.18), rgba(236, 72, 153, 0.12));
+            border-color: var(--primary);
+            box-shadow: 
+                0 8px 28px rgba(168, 85, 247, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .product-card-mini.active::before {
+            opacity: 1;
+            background: linear-gradient(180deg, var(--accent), var(--primary));
+        }
+
+        .mini-icon {
             width: 48px;
             height: 48px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--pink));
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px var(--gold-glow);
+            box-shadow: 0 4px 14px rgba(168, 85, 247, 0.3);
         }
 
-        .selector-info {
+        .mini-info {
             flex: 1;
             min-width: 0;
-            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
         }
 
-        .selector-name {
-            font-size: 1.05rem;
+        .mini-name {
+            font-size: 0.98rem;
             font-weight: 700;
-            color: var(--ink);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .selector-meta {
-            font-size: 0.8rem;
-            color: var(--ink-muted);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 3px;
-        }
-
-        .selector-count-badge {
-            background: var(--success);
-            color: var(--white);
-            font-size: 0.72rem;
-            font-weight: 800;
-            padding: 3px 10px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
-        }
-
-        .selector-count-badge.low {
-            background: var(--warning);
-            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
-        }
-
-        .selector-count-badge.critical {
-            background: var(--danger);
-            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
-        }
-
-        .selector-actions {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .selector-edit-btn {
-            background: var(--gold-soft);
-            border: 1px solid var(--gold);
-            color: var(--gold-dark);
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            transition: all 0.2s;
-            flex-shrink: 0;
-            font-weight: 700;
-        }
-
-        .selector-edit-btn:hover {
-            background: var(--gold);
-            color: var(--white);
-        }
-
-        .selector-arrow {
-            font-size: 0.9rem;
-            color: var(--gold);
-            transition: transform 0.3s;
-            flex-shrink: 0;
-            font-weight: 700;
-        }
-
-        .selector-trigger.open .selector-arrow {
-            transform: rotate(180deg);
-        }
-
-        /* ===== DROPDOWN MENU ===== */
-        .selector-dropdown {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border: 2px solid var(--gold);
-            border-radius: 18px;
-            padding: 12px;
-            max-height: 60vh;
-            overflow: hidden;
-            display: none;
-            flex-direction: column;
-            box-shadow: var(--shadow-lg);
-            animation: dropdownIn 0.25s ease;
-            z-index: 200;
-        }
-
-        .selector-dropdown.open {
-            display: flex;
-        }
-
-        @keyframes dropdownIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .dropdown-search {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 2px solid var(--line);
-            background: var(--off-white);
-            color: var(--ink);
-            font-size: 0.95rem;
-            font-family: inherit;
-            outline: none;
-            margin-bottom: 10px;
-            transition: all 0.25s;
-            direction: rtl;
-            font-weight: 600;
-        }
-
-        .dropdown-search:focus {
-            border-color: var(--gold);
-            background: var(--white);
-            box-shadow: 0 0 0 3px var(--gold-soft);
-        }
-
-        .dropdown-search::placeholder {
-            color: var(--ink-faint);
-            font-weight: 500;
-        }
-
-        .dropdown-list {
-            overflow-y: auto;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            padding: 4px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: var(--gold) var(--cream);
-        }
-
-        .dropdown-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .dropdown-list::-webkit-scrollbar-track {
-            background: var(--cream);
-            border-radius: 3px;
-        }
-
-        .dropdown-list::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, var(--gold), var(--gold-light));
-            border-radius: 3px;
-        }
-
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            background: transparent;
-            border: 1px solid transparent;
-        }
-
-        .dropdown-item:hover {
-            background: var(--cream);
-            border-color: var(--line);
-        }
-
-        .dropdown-item.active {
-            background: var(--gold-soft);
-            border-color: var(--gold);
-        }
-
-        .dropdown-item-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--gold-soft), var(--cream));
-            border: 1px solid var(--line);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .dropdown-item.active .dropdown-item-icon {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border-color: var(--gold);
-        }
-
-        .dropdown-item-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .dropdown-item-name {
-            font-size: 0.92rem;
-            font-weight: 700;
-            color: var(--ink);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .dropdown-item-meta {
+        .mini-weight {
             font-size: 0.75rem;
-            color: var(--ink-muted);
-            margin-top: 2px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
+            color: var(--text-dim);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .dropdown-item-count {
-            background: var(--success-soft);
-            color: var(--success);
-            font-size: 0.72rem;
+        .mini-count {
+            background: linear-gradient(135deg, var(--success), #34d399);
+            color: #fff;
+            font-size: 0.8rem;
             font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 10px;
-            min-width: 32px;
+            padding: 5px 12px;
+            border-radius: 12px;
+            min-width: 44px;
             text-align: center;
+            box-shadow: 
+                0 4px 14px rgba(16, 185, 129, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
             flex-shrink: 0;
         }
 
-        .dropdown-item-count.low {
-            background: var(--warning-soft);
-            color: var(--warning);
-        }
-
-        .dropdown-item-count.critical {
-            background: var(--danger-soft);
-            color: var(--danger);
-        }
-
-        .dropdown-item-edit {
-            background: none;
-            border: none;
-            color: var(--ink-faint);
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
+        .mini-delete {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #f87171;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            font-size: 0.9rem;
             cursor: pointer;
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
             transition: all 0.2s;
             flex-shrink: 0;
-            font-weight: 700;
+            opacity: 0.6;
         }
 
-        .dropdown-item:hover .dropdown-item-edit {
+        .product-card-mini:hover .mini-delete {
+            opacity: 1;
+        }
+
+        .mini-delete:hover {
+            background: rgba(239, 68, 68, 0.25);
+            transform: scale(1.08);
+        }
+
+        .empty-list {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px dashed var(--glass-border);
+            border-radius: 18px;
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .empty-list .empty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 9999;
             display: flex;
-        }
-
-        .dropdown-item-edit:hover {
-            background: var(--gold-soft);
-            color: var(--gold-dark);
-        }
-
-        .dropdown-footer {
-            border-top: 1px solid var(--line-soft);
-            padding-top: 10px;
-            margin-top: 8px;
-        }
-
-        .dropdown-add-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 2px dashed var(--gold);
-            background: var(--gold-soft);
-            color: var(--gold-dark);
-            font-size: 0.92rem;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.25s;
-            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 20px;
+            transition: opacity 0.5s ease;
         }
 
-        .dropdown-add-btn:hover {
-            background: var(--gold);
-            color: var(--white);
-            border-style: solid;
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .dropdown-empty {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--ink-muted);
-            font-size: 0.9rem;
+        .loading-spinner {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 3px solid var(--glass-border);
+            border-top-color: var(--primary);
+            border-right-color: var(--pink);
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, #a855f7, #ec4899, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .loading-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== SYNC INDICATOR ===== */
+        .sync-badge {
+            position: fixed;
+            top: 76px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--accent);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 20px;
+            z-index: 98;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .sync-badge.visible {
+            opacity: 1;
+        }
+
+        .sync-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
         /* ===== MAIN CONTAINER ===== */
         .container {
-            max-width: 520px;
+            max-width: 480px;
             margin: 0 auto;
-            padding: 24px 16px;
+            padding: 24px 16px 50px;
             position: relative;
             z-index: 1;
         }
 
         /* ===== PRODUCT CARD ===== */
         .product-card {
-            background: var(--white);
-            border: 2px solid var(--line);
-            border-radius: 24px;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
             padding: 32px 22px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             position: relative;
             overflow: hidden;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
         .product-card::before {
             content: '';
             position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 60%);
+            animation: pulse 5s ease-in-out infinite;
+        }
+
+        .product-card::after {
+            content: '';
+            position: absolute;
             top: 0; left: 0; right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.15); opacity: 1; }
         }
 
         .product-icon {
-            width: 100px;
-            height: 100px;
+            width: 110px;
+            height: 110px;
             margin: 0 auto 18px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border-radius: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--pink));
+            border-radius: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 52px;
             position: relative;
             z-index: 1;
-            box-shadow: 0 12px 30px var(--gold-glow);
+            box-shadow: 
+                0 15px 40px rgba(168, 85, 247, 0.4),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
             animation: float 4s ease-in-out infinite;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
+            50% { transform: translateY(-8px); }
         }
 
         .product-name {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 800;
             margin-bottom: 6px;
-            color: var(--ink);
             position: relative;
             z-index: 1;
+            background: linear-gradient(90deg, #fff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .product-weight {
             font-size: 0.95rem;
-            color: var(--ink-muted);
-            margin-bottom: 20px;
+            color: var(--text-dim);
+            margin-bottom: 28px;
             position: relative;
             z-index: 1;
-        }
-
-        /* ===== MINIMUM STOCK BADGE ===== */
-        .min-stock-info {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.82rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-            transition: all 0.3s;
-        }
-
-        .min-stock-info.ok {
-            background: var(--success-soft);
-            color: var(--success);
-            border: 1px solid rgba(22, 163, 74, 0.2);
-        }
-
-        .min-stock-info.low {
-            background: var(--warning-soft);
-            color: #b45309;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            animation: pulseWarn 2s ease-in-out infinite;
-        }
-
-        .min-stock-info.critical {
-            background: var(--danger-soft);
-            color: var(--danger);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            animation: pulseWarn 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulseWarn {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-        }
-
-        .min-edit-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.85rem;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-            padding: 0;
-            color: inherit;
-        }
-
-        .min-edit-btn:hover {
-            opacity: 1;
         }
 
         /* ===== COUNTER ===== */
@@ -608,27 +552,23 @@
             position: relative;
             z-index: 1;
             margin-bottom: 14px;
-            padding: 24px 20px;
-            background: var(--off-white);
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 20px;
-            border: 2px solid var(--line);
+            border: 1px solid var(--glass-border);
         }
 
         .counter-number {
             font-size: 5rem;
             font-weight: 900;
-            color: var(--ink);
+            background: linear-gradient(135deg, #06b6d4, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             line-height: 1;
-            transition: all 0.3s;
+            transition: transform 0.3s;
+            text-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
             letter-spacing: -2px;
-        }
-
-        .counter-number.low {
-            color: var(--warning);
-        }
-
-        .counter-number.critical {
-            color: var(--danger);
         }
 
         .counter-number.bump {
@@ -637,17 +577,17 @@
 
         @keyframes bump {
             0% { transform: scale(1); }
-            40% { transform: scale(1.2); }
+            40% { transform: scale(1.25); }
             100% { transform: scale(1); }
         }
 
         .counter-label {
             font-size: 0.85rem;
-            color: var(--ink-muted);
+            color: var(--text-dim);
             margin-top: 8px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            font-weight: 700;
+            font-weight: 600;
         }
 
         /* ===== BUTTONS ===== */
@@ -655,7 +595,7 @@
             display: flex;
             gap: 14px;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 28px;
             position: relative;
             z-index: 1;
         }
@@ -665,58 +605,81 @@
             max-width: 170px;
             padding: 18px 12px;
             border: none;
-            border-radius: 16px;
-            font-size: 1rem;
+            border-radius: 18px;
+            font-size: 1.05rem;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            transition: all 0.25s ease;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: inherit;
-            color: var(--white);
+            color: #fff;
             position: relative;
             overflow: hidden;
         }
 
+        .scan-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.5s;
+        }
+
+        .scan-btn:hover::before {
+            left: 100%;
+        }
+
         .scan-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.93);
         }
 
         .btn-add {
-            background: linear-gradient(135deg, var(--success), var(--success-light));
-            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
+            background: linear-gradient(135deg, var(--success), #34d399);
+            box-shadow: 
+                0 10px 30px rgba(16, 185, 129, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
 
         .btn-add:hover {
-            box-shadow: 0 12px 28px rgba(22, 163, 74, 0.4);
+            box-shadow: 
+                0 14px 40px rgba(16, 185, 129, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
             transform: translateY(-2px);
         }
 
         .btn-remove {
-            background: linear-gradient(135deg, var(--danger), var(--danger-light));
-            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+            background: linear-gradient(135deg, var(--danger), #f87171);
+            box-shadow: 
+                0 10px 30px rgba(239, 68, 68, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
 
         .btn-remove:hover {
-            box-shadow: 0 12px 28px rgba(220, 38, 38, 0.4);
+            box-shadow: 
+                0 14px 40px rgba(239, 68, 68, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
             transform: translateY(-2px);
         }
 
         .btn-icon {
-            font-size: 2rem;
+            font-size: 2.2rem;
             line-height: 1;
-            font-weight: 400;
+            font-weight: 300;
         }
 
         /* ===== CODES LIST ===== */
         .list-section {
-            background: var(--white);
-            border: 2px solid var(--line);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: var(--shadow-md);
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
         }
 
         .list-header {
@@ -725,38 +688,34 @@
             align-items: center;
             margin-bottom: 16px;
             padding-bottom: 14px;
-            border-bottom: 2px solid var(--line-soft);
+            border-bottom: 1px solid var(--glass-border);
         }
 
         .list-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--ink);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .list-title .gold-dot {
-            color: var(--gold);
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #fff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .clear-btn {
-            background: var(--danger-soft);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            color: var(--danger);
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
             padding: 7px 14px;
-            border-radius: 10px;
+            border-radius: 11px;
             font-size: 0.8rem;
             cursor: pointer;
             font-family: inherit;
-            transition: all 0.25s;
-            font-weight: 700;
+            transition: all 0.3s;
+            font-weight: 600;
         }
 
         .clear-btn:hover {
-            background: var(--danger);
-            color: var(--white);
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-1px);
         }
 
         .codes-list {
@@ -765,34 +724,27 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
-            scrollbar-color: var(--gold) var(--cream);
         }
 
         .codes-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .codes-list::-webkit-scrollbar-track {
-            background: var(--cream);
-            border-radius: 3px;
+            width: 4px;
         }
 
         .codes-list::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, var(--gold), var(--gold-light));
-            border-radius: 3px;
+            background: linear-gradient(180deg, var(--primary), var(--pink));
+            border-radius: 4px;
         }
 
         .code-item {
-            background: var(--off-white);
-            border: 1px solid var(--line);
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 13px;
             padding: 12px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            animation: slideIn 0.3s ease;
+            animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             direction: ltr;
             transition: all 0.2s;
             position: relative;
@@ -804,12 +756,13 @@
             position: absolute;
             top: 0; left: 0;
             width: 3px; height: 100%;
-            background: linear-gradient(180deg, var(--gold), var(--gold-light));
+            background: linear-gradient(180deg, var(--accent), var(--primary));
+            opacity: 0.5;
         }
 
         .code-item:hover {
-            background: var(--cream);
-            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(168, 85, 247, 0.2);
         }
 
         @keyframes slideIn {
@@ -820,14 +773,14 @@
         .code-text {
             font-family: 'Courier New', monospace;
             font-size: 0.95rem;
-            color: var(--ink);
+            color: var(--accent);
             letter-spacing: 1px;
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .code-time {
             font-size: 0.7rem;
-            color: var(--ink-faint);
+            color: var(--text-muted);
             margin-top: 2px;
         }
 
@@ -835,36 +788,37 @@
             display: inline-flex;
             align-items: center;
             gap: 3px;
-            background: var(--warning);
-            color: var(--white);
+            background: linear-gradient(135deg, var(--warning), #fbbf24);
+            color: #1a1a2e;
             font-size: 0.68rem;
             font-weight: 800;
             padding: 2px 8px;
             border-radius: 8px;
             margin-right: 8px;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
         }
 
         .code-delete {
             background: none;
             border: none;
-            color: var(--ink-faint);
+            color: var(--text-muted);
             font-size: 1.2rem;
             cursor: pointer;
             padding: 4px 8px;
             border-radius: 8px;
             transition: all 0.2s;
-            font-weight: 700;
         }
 
         .code-delete:hover {
-            color: var(--danger);
-            background: var(--danger-soft);
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.15);
+            transform: scale(1.15);
         }
 
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: var(--ink-muted);
+            color: var(--text-muted);
         }
 
         .empty-state .empty-icon {
@@ -876,7 +830,7 @@
         .no-product-state {
             text-align: center;
             padding: 60px 20px;
-            color: var(--ink-muted);
+            color: var(--text-dim);
         }
 
         .no-product-state .big-icon {
@@ -888,35 +842,28 @@
         .no-product-state .big-text {
             font-size: 1.15rem;
             margin-bottom: 24px;
-            font-weight: 700;
-            color: var(--ink-soft);
+            font-weight: 600;
         }
 
         .no-product-state .create-btn {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: var(--white);
+            background: linear-gradient(135deg, var(--primary), var(--pink));
+            color: #fff;
             border: none;
             padding: 14px 28px;
-            border-radius: 14px;
+            border-radius: 16px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
-            box-shadow: var(--shadow-gold);
-            transition: all 0.25s;
-            margin: 5px;
+            box-shadow: 
+                0 10px 30px rgba(168, 85, 247, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
         }
 
         .no-product-state .create-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 14px 35px var(--gold-glow);
-        }
-
-        .no-product-state .create-btn.secondary {
-            background: var(--white);
-            color: var(--gold-dark);
-            border: 2px solid var(--gold);
-            box-shadow: var(--shadow-sm);
+            transform: translateY(-3px);
+            box-shadow: 0 14px 40px rgba(168, 85, 247, 0.55);
         }
 
         /* ===== MODAL ===== */
@@ -924,14 +871,14 @@
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            animation: fadeIn 0.2s ease;
+            animation: fadeIn 0.25s ease;
         }
 
         @keyframes fadeIn {
@@ -944,19 +891,18 @@
         }
 
         .modal-content {
-            background: var(--white);
-            border: 2px solid var(--gold);
-            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.98), rgba(22, 33, 62, 0.98));
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
             padding: 26px;
             width: 100%;
             max-width: 420px;
             text-align: center;
             max-height: 90vh;
             overflow-y: auto;
-            animation: slideUp 0.3s ease;
-            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
             scrollbar-width: thin;
-            scrollbar-color: var(--gold) var(--cream);
         }
 
         @keyframes slideUp {
@@ -968,33 +914,28 @@
             font-size: 1.25rem;
             font-weight: 800;
             margin-bottom: 6px;
-            color: var(--ink);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .modal-title .gold-icon {
-            color: var(--gold);
+            background: linear-gradient(90deg, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .modal-subtitle {
             font-size: 0.85rem;
-            color: var(--ink-muted);
+            color: var(--text-dim);
             margin-bottom: 22px;
         }
 
         #reader {
             width: 100%;
-            border-radius: 16px;
+            border-radius: 18px;
             overflow: hidden;
             margin-bottom: 18px;
-            border: 2px solid var(--line);
+            border: 2px solid var(--glass-border);
         }
 
         #reader video {
-            border-radius: 14px;
+            border-radius: 16px;
         }
 
         .manual-input {
@@ -1006,70 +947,67 @@
         .manual-input input {
             flex: 1;
             padding: 13px 16px;
-            border-radius: 12px;
-            border: 2px solid var(--line);
-            background: var(--off-white);
-            color: var(--ink);
+            border-radius: 13px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
             font-size: 1rem;
             font-family: 'Courier New', monospace;
             text-align: center;
             direction: ltr;
             outline: none;
-            transition: all 0.25s;
-            font-weight: 700;
+            transition: all 0.3s;
         }
 
         .manual-input input:focus {
-            border-color: var(--gold);
-            background: var(--white);
-            box-shadow: 0 0 0 3px var(--gold-soft);
+            border-color: var(--primary);
+            background: rgba(168, 85, 247, 0.08);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
         }
 
         .manual-input input::placeholder {
-            color: var(--ink-faint);
-            font-weight: 500;
+            color: var(--text-muted);
         }
 
         .manual-submit {
             padding: 13px 22px;
-            border-radius: 12px;
+            border-radius: 13px;
             border: none;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: var(--white);
+            background: linear-gradient(135deg, var(--primary), var(--pink));
+            color: #fff;
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
             font-size: 0.95rem;
-            transition: all 0.25s;
-            box-shadow: var(--shadow-gold);
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3);
         }
 
         .manual-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px var(--gold-glow);
+            box-shadow: 0 10px 28px rgba(168, 85, 247, 0.45);
         }
 
         .close-modal {
             width: 100%;
             padding: 14px;
-            border-radius: 12px;
-            border: 2px solid var(--line);
-            background: var(--white);
-            color: var(--ink-soft);
+            border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
             font-size: 1rem;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
             font-family: inherit;
-            transition: all 0.25s;
+            transition: all 0.3s;
         }
 
         .close-modal:hover {
-            background: var(--off-white);
-            border-color: var(--gold);
-            color: var(--gold-dark);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* ===== PRODUCT FORM ===== */
+        /* ===== NEW PRODUCT FORM ===== */
         .form-group {
             margin-bottom: 18px;
             text-align: right;
@@ -1078,63 +1016,34 @@
         .form-label {
             display: block;
             font-size: 0.85rem;
-            color: var(--ink-soft);
+            color: var(--text-dim);
             margin-bottom: 8px;
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .form-input {
             width: 100%;
             padding: 13px 16px;
-            border-radius: 12px;
-            border: 2px solid var(--line);
-            background: var(--off-white);
-            color: var(--ink);
+            border-radius: 13px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
             font-size: 1rem;
             font-family: inherit;
             outline: none;
             text-align: right;
             direction: rtl;
-            transition: all 0.25s;
-            font-weight: 600;
+            transition: all 0.3s;
         }
 
         .form-input:focus {
-            border-color: var(--gold);
-            background: var(--white);
-            box-shadow: 0 0 0 3px var(--gold-soft);
+            border-color: var(--primary);
+            background: rgba(168, 85, 247, 0.08);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
         }
 
         .form-input::placeholder {
-            color: var(--ink-faint);
-            font-weight: 500;
-        }
-
-        .form-hint {
-            font-size: 0.75rem;
-            color: var(--ink-muted);
-            margin-top: 6px;
-        }
-
-        .min-stock-input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .min-stock-input-wrapper input {
-            flex: 1;
-        }
-
-        .min-stock-preview {
-            background: var(--warning-soft);
-            color: #b45309;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            white-space: nowrap;
+            color: var(--text-muted);
         }
 
         .emoji-picker {
@@ -1143,21 +1052,19 @@
             gap: 8px;
             justify-content: center;
             padding: 14px;
-            background: var(--off-white);
-            border-radius: 14px;
-            border: 2px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
             max-height: 200px;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
-            scrollbar-color: var(--gold) var(--cream);
         }
 
         .emoji-option {
             width: 46px;
             height: 46px;
-            border-radius: 12px;
-            background: var(--white);
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.04);
             border: 2px solid transparent;
             font-size: 1.5rem;
             cursor: pointer;
@@ -1168,57 +1075,37 @@
         }
 
         .emoji-option:hover {
-            background: var(--cream);
-            transform: scale(1.1);
-            border-color: var(--line);
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.12);
         }
 
         .emoji-option.selected {
-            border-color: var(--gold);
-            background: var(--gold-soft);
-            box-shadow: 0 0 0 3px var(--gold-soft);
+            border-color: var(--primary);
+            background: rgba(168, 85, 247, 0.2);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
         }
 
         .submit-product-btn {
             width: 100%;
             padding: 15px;
-            border-radius: 14px;
+            border-radius: 15px;
             border: none;
-            background: linear-gradient(135deg, var(--success), var(--success-light));
-            color: var(--white);
+            background: linear-gradient(135deg, var(--success), #34d399);
+            color: #fff;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
             margin-top: 10px;
-            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
-            transition: all 0.25s;
+            box-shadow: 
+                0 10px 30px rgba(16, 185, 129, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
         }
 
         .submit-product-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(22, 163, 74, 0.4);
-        }
-
-        .delete-product-btn {
-            width: 100%;
-            padding: 13px;
-            border-radius: 12px;
-            border: 2px solid rgba(220, 38, 38, 0.3);
-            background: var(--danger-soft);
-            color: var(--danger);
-            font-size: 0.92rem;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: inherit;
-            margin-top: 10px;
-            transition: all 0.25s;
-        }
-
-        .delete-product-btn:hover {
-            background: var(--danger);
-            color: var(--white);
-            border-color: var(--danger);
+            box-shadow: 0 14px 35px rgba(16, 185, 129, 0.5);
         }
 
         /* ===== TOAST ===== */
@@ -1240,13 +1127,15 @@
             padding: 14px 22px;
             border-radius: 14px;
             font-size: 0.9rem;
-            font-weight: 700;
-            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+            font-weight: 600;
+            animation: toastIn 0.4s cubic-bezier(0.4, 0, 0.2, 1), toastOut 0.4s ease 2.6s forwards;
             white-space: nowrap;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             pointer-events: auto;
             text-align: center;
-            box-shadow: var(--shadow-lg);
-            border: 2px solid transparent;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
             position: relative;
         }
@@ -1257,7 +1146,7 @@
             bottom: 0; left: 0;
             height: 3px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.3);
             animation: shrink 3s linear forwards;
             transform-origin: right;
         }
@@ -1268,31 +1157,28 @@
         }
 
         .toast-success {
-            background: var(--white);
-            color: var(--success);
-            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(52, 211, 153, 0.95));
+            color: #fff;
         }
 
         .toast-error {
-            background: var(--white);
-            color: var(--danger);
-            border-color: var(--danger);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(248, 113, 113, 0.95));
+            color: #fff;
         }
 
         .toast-info {
-            background: var(--white);
-            color: var(--gold-dark);
-            border-color: var(--gold);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.95), rgba(168, 85, 247, 0.95));
+            color: #fff;
         }
 
         @keyframes toastIn {
-            from { opacity: 0; transform: translateY(-20px) scale(0.9); }
+            from { opacity: 0; transform: translateY(-25px) scale(0.9); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         @keyframes toastOut {
             from { opacity: 1; transform: translateY(0) scale(1); }
-            to { opacity: 0; transform: translateY(-20px) scale(0.9); }
+            to { opacity: 0; transform: translateY(-25px) scale(0.9); }
         }
 
         /* ===== SOUND TOGGLE ===== */
@@ -1303,81 +1189,79 @@
             width: 52px;
             height: 52px;
             border-radius: 50%;
-            background: var(--white);
-            border: 2px solid var(--gold);
-            color: var(--gold);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            color: #fff;
             font-size: 1.3rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 50;
-            transition: all 0.25s;
-            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
         .sound-toggle:hover {
-            background: var(--gold);
-            color: var(--white);
+            background: rgba(255, 255, 255, 0.12);
             transform: scale(1.08);
+            border-color: var(--primary);
         }
 
         .sound-toggle.muted {
-            opacity: 0.5;
-            border-color: var(--line);
-            color: var(--ink-faint);
+            opacity: 0.45;
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 380px) {
             .counter-number { font-size: 4rem; }
-            .product-icon { width: 85px; height: 85px; font-size: 40px; }
-            .header h1 { font-size: 1.1rem; }
+            .product-icon { width: 90px; height: 90px; font-size: 42px; }
+            .header h1 { font-size: 0.95rem; }
             .product-card { padding: 26px 18px; }
-            .selector-name { font-size: 0.95rem; }
+            .mini-name { font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER -->
-    <div class="header">
-        <h1>
-            <span class="gold-accent">◆</span>
-            عدّاد المنتجات
-        </h1>
-        <button class="icon-btn" onclick="openNewProductModal()" title="إضافة منتج جديد">＋</button>
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">جاري الاتصال بقاعدة البيانات...</div>
+        <div class="loading-sub">Firebase Firestore</div>
     </div>
 
-    <!-- PRODUCT SELECTOR (DROPDOWN) -->
-    <div class="product-selector">
-        <div class="selector-wrapper">
-            <div class="selector-trigger" id="selectorTrigger" onclick="toggleDropdown()">
-                <div class="selector-icon" id="selectorIcon">📦</div>
-                <div class="selector-info">
-                    <div class="selector-name" id="selectorName">اختر منتجاً...</div>
-                    <div class="selector-meta">
-                        <span id="selectorWeight">—</span>
-                        <span class="selector-count-badge" id="selectorCount">0</span>
-                    </div>
-                </div>
-                <div class="selector-actions">
-                    <button class="selector-edit-btn" onclick="event.stopPropagation(); editActiveProduct()" title="تعديل المنتج">✎</button>
-                    <div class="selector-arrow">▼</div>
-                </div>
-            </div>
+    <!-- SYNC INDICATOR -->
+    <div class="sync-badge" id="syncBadge">
+        <span class="sync-dot"></span>
+        <span>متزامن مع السحابة</span>
+    </div>
 
-            <div class="selector-dropdown" id="selectorDropdown">
-                <input type="text" class="dropdown-search" id="dropdownSearch" placeholder="🔍 ابحث عن منتج..." oninput="filterDropdown()" />
-                <div class="dropdown-list" id="dropdownList"></div>
-                <div class="dropdown-footer">
-                    <button class="dropdown-add-btn" onclick="openNewProductModal()">
-                        <span>＋</span>
-                        <span>إضافة منتج جديد</span>
-                    </button>
-                </div>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <button class="icon-btn danger" onclick="deleteAllProducts()" title="حذف جميع المنتجات">🗑️</button>
+            <button class="icon-btn primary" onclick="openNewProductModal()" title="إضافة منتج جديد">＋</button>
+        </div>
+        <h1>📦 نظام عدّاد المنتجات</h1>
+        <div style="width: 92px;"></div>
+    </div>
+
+    <!-- PRODUCTS LIST (VERTICAL) -->
+    <div class="products-section">
+        <div class="products-section-header">
+            <div class="products-section-title">
+                <span>📋 قائمة المنتجات</span>
+                <span class="badge" id="productsCount">0</span>
+            </div>
+            <div class="sort-indicator">
+                <span>أبجدي</span>
+                <span>⇅</span>
             </div>
         </div>
+        <div class="products-list" id="productsList"></div>
     </div>
 
     <!-- TOAST CONTAINER -->
@@ -1389,56 +1273,43 @@
     </button>
 
     <!-- MAIN -->
-    <div class="container" id="mainContainer"></div>
+    <div class="container" id="mainContainer">
+        <!-- Content will be rendered dynamically -->
+    </div>
 
     <!-- SCANNER MODAL -->
     <div class="modal-overlay" id="scannerModal">
         <div class="modal-content">
-            <div class="modal-title" id="modalTitle">
-                <span class="gold-icon">◆</span>
-                <span>مسح الرقم التسلسلي</span>
-            </div>
-            <div class="modal-subtitle" id="modalSubtitle">وجّه الكاميرا نحو الباركود أو أدخل الرقم يدوياً</div>
+            <div class="modal-title" id="modalTitle">مسح الرقم التسلسلي</div>
+            <div class="modal-subtitle" id="modalSubtitle">وجّه الكاميرا نحو الباركود أو الرقم التسلسلي</div>
 
             <div id="reader"></div>
 
-            <div style="color: var(--ink-muted); font-size: 0.8rem; margin-bottom: 12px; font-weight: 600;">— أو أدخل الرقم يدوياً —</div>
+            <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 12px;">— أو أدخل الرقم يدوياً —</div>
 
             <div class="manual-input">
                 <input type="text" id="manualCode" placeholder="أدخل الرقم التسلسلي" />
                 <button class="manual-submit" onclick="handleManualInput()">تأكيد</button>
             </div>
 
-            <button class="close-modal" onclick="closeScanner()">إغلاق</button>
+            <button class="close-modal" onclick="closeScanner()">إغلاق الكاميرا</button>
         </div>
     </div>
 
-    <!-- NEW/EDIT PRODUCT MODAL -->
-    <div class="modal-overlay" id="productModal">
+    <!-- NEW PRODUCT MODAL -->
+    <div class="modal-overlay" id="newProductModal">
         <div class="modal-content">
-            <div class="modal-title" id="productModalTitle">
-                <span class="gold-icon">◆</span>
-                <span>إضافة منتج جديد</span>
-            </div>
-            <div class="modal-subtitle" id="productModalSubtitle">أدخل بيانات المنتج الذي تريد إضافته</div>
+            <div class="modal-title">➕ إضافة منتج جديد</div>
+            <div class="modal-subtitle">أدخل بيانات المنتج الذي تريد إضافته</div>
 
             <div class="form-group">
                 <label class="form-label">اسم المنتج</label>
-                <input type="text" class="form-input" id="productNameInput" placeholder="مثال: ورق A4 180g" maxlength="50" />
+                <input type="text" class="form-input" id="newProductName" placeholder="مثال: ورق A4" maxlength="30" />
             </div>
 
             <div class="form-group">
                 <label class="form-label">الوصف / الوزن</label>
-                <input type="text" class="form-input" id="productWeightInput" placeholder="مثال: 180 غرام / م²" maxlength="60" />
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">الحد الأدنى للكمية (اختياري)</label>
-                <div class="min-stock-input-wrapper">
-                    <input type="number" class="form-input" id="productMinStockInput" placeholder="0" min="0" max="9999" style="direction: ltr; text-align: center;" />
-                    <div class="min-stock-preview" id="minStockPreview">بدون حد</div>
-                </div>
-                <div class="form-hint">💡 عند وصول الكمية إلى هذا الحد أو أقل، سيظهر تنبيه برتقالي/أحمر</div>
+                <input type="text" class="form-input" id="newProductWeight" placeholder="مثال: 260 غرام / م²" maxlength="40" />
             </div>
 
             <div class="form-group">
@@ -1446,127 +1317,133 @@
                 <div class="emoji-picker" id="emojiPicker"></div>
             </div>
 
-            <button class="submit-product-btn" id="submitProductBtn" onclick="submitProduct()">✓ إنشاء المنتج</button>
-            <button class="delete-product-btn" id="deleteProductBtn" onclick="deleteActiveProduct()" style="display:none;">🗑️ حذف المنتج</button>
-            <button class="close-modal" style="margin-top: 10px;" onclick="closeProductModal()">إلغاء</button>
-        </div>
-    </div>
-
-    <!-- MIN STOCK EDIT MODAL -->
-    <div class="modal-overlay" id="minStockModal">
-        <div class="modal-content">
-            <div class="modal-title">
-                <span class="gold-icon">⚠</span>
-                <span>تعديل الحد الأدنى</span>
-            </div>
-            <div class="modal-subtitle" id="minStockModalSubtitle">حدد الحد الأدنى للكمية</div>
-
-            <div class="form-group">
-                <label class="form-label">الحد الأدنى للكمية</label>
-                <input type="number" class="form-input" id="minStockEditInput" placeholder="0" min="0" max="9999" style="direction: ltr; text-align: center; font-size: 1.5rem; font-weight: 800;" />
-                <div class="form-hint">💡 اتركه 0 لإلغاء التنبيه</div>
-            </div>
-
-            <button class="submit-product-btn" onclick="saveMinStock()">✓ حفظ</button>
-            <button class="close-modal" style="margin-top: 10px;" onclick="closeMinStockModal()">إلغاء</button>
+            <button class="submit-product-btn" onclick="createNewProduct()">✓ إنشاء المنتج</button>
+            <button class="close-modal" style="margin-top: 10px;" onclick="closeNewProductModal()">إلغاء</button>
         </div>
     </div>
 
     <script>
-        // ===== DEFAULT PRODUCTS =====
-        const defaultProducts = [
-            { name: 'ورق A4 180 g', weight: '180 غرام / م²', icon: '📄' },
-            { name: 'ورق A4 180g DF', weight: '180 غرام / م² - DF', icon: '📄' },
-            { name: 'ورق A4 260g', weight: '260 غرام / م²', icon: '📄' },
-            { name: 'ورق A4 260g DF', weight: '260 غرام / م² - DF', icon: '📄' },
-            { name: 'ورق لاصق A4 135g', weight: '135 غرام / م² - لاصق', icon: '🏷️' },
-            { name: 'ورق شفاف لاصق', weight: 'شفاف لاصق', icon: '🎞️' },
-            { name: 'ورق شفاف عادي', weight: 'شفاف عادي', icon: '🎞️' },
-            { name: 'ورق A3', weight: 'حجم A3', icon: '📃' },
-            { name: 'ورق A3 DF', weight: 'حجم A3 - DF', icon: '📃' },
-            { name: 'كادر A4 ابيض', weight: 'مقاس A4 - أبيض', icon: '🖼️' },
-            { name: 'كادر A4 اسود', weight: 'مقاس A4 - أسود', icon: '🖼️' },
-            { name: 'كادر A4 ذهبي', weight: 'مقاس A4 - ذهبي', icon: '🏆' },
-            { name: 'كادر A4 فضي', weight: 'مقاس A4 - فضي', icon: '🥈' },
-            { name: 'كادر A4 بني', weight: 'مقاس A4 - بني', icon: '🟫' },
-            { name: 'كادر A5 ابيض', weight: 'مقاس A5 - أبيض', icon: '🖼️' },
-            { name: 'كادر A5 اسود', weight: 'مقاس A5 - أسود', icon: '🖼️' },
-            { name: 'كادر A5 ذهبي', weight: 'مقاس A5 - ذهبي', icon: '🏆' },
-            { name: 'كادر A5 فضي', weight: 'مقاس A5 - فضي', icon: '🥈' },
-            { name: 'كادر A5 بني', weight: 'مقاس A5 - بني', icon: '🟫' },
-            { name: 'كادر A3 ابيض', weight: 'مقاس A3 - أبيض', icon: '🖼️' },
-            { name: 'كادر A3 اسود', weight: 'مقاس A3 - أسود', icon: '🖼️' },
-            { name: 'كادر A3 ذهبي', weight: 'مقاس A3 - ذهبي', icon: '🏆' },
-            { name: 'كادر A3 فضي', weight: 'مقاس A3 - فضي', icon: '🥈' },
-            { name: 'كادر A3 بني', weight: 'مقاس A3 - بني', icon: '🟫' },
-            { name: 'كادر A2 ابيض', weight: 'مقاس A2 - أبيض', icon: '🖼️' },
-            { name: 'كادر A2 اسود', weight: 'مقاس A2 - أسود', icon: '🖼️' },
-            { name: 'كادر A2 ذهبي', weight: 'مقاس A2 - ذهبي', icon: '🏆' },
-            { name: 'كادر A2 فضي', weight: 'مقاس A2 - فضي', icon: '🥈' },
-            { name: 'كادر A2 بني', weight: 'مقاس A2 - بني', icon: '🟫' },
-            { name: 'كادر A6 ابيض', weight: 'مقاس A6 - أبيض', icon: '🖼️' },
-            { name: 'كادر A6 اسود', weight: 'مقاس A6 - أسود', icon: '🖼️' },
-            { name: 'كادر A6 ذهبي', weight: 'مقاس A6 - ذهبي', icon: '🏆' },
-            { name: 'كادر A6 فضي', weight: 'مقاس A6 - فضي', icon: '🥈' },
-            { name: 'كادر A6 بني', weight: 'مقاس A6 - بني', icon: '🟫' },
-            { name: 'لصاق تيكنو كبيرة', weight: 'حجم كبير', icon: '🏷️' },
-            { name: 'لصاق تيكنو صغيرة', weight: 'حجم صغير', icon: '🏷️' },
-        ];
+        // ===== FIREBASE INIT =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOqdu2w3uvBsrISQG7jhf-maOGAT4jl1I",
+            authDomain: "mantoji-748b3.firebaseapp.com",
+            projectId: "mantoji-748b3",
+            storageBucket: "mantoji-748b3.firebasestorage.app",
+            messagingSenderId: "105745656843",
+            appId: "1:105745656843:web:eb716fa74c23d6ff7eab0e",
+            measurementId: "G-8WWQ1F8HJV"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
         // ===== STATE =====
-        let products = JSON.parse(localStorage.getItem('products_v5') || 'null');
-        let activeProductId = localStorage.getItem('activeProductId_v5') || null;
+        let products = [];
+        let activeProductId = localStorage.getItem('activeProductId') || null;
         let currentMode = 'add';
         let html5QrCode = null;
         let isScanning = false;
         let selectedEmoji = '📦';
         let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
-        let editingProductId = null;
-        let dropdownOpen = false;
+        let isFirstLoad = true;
 
-        const defaultEmojis = ['📦','📄','📃','📋','📎','🖨️','📚','📝','✏️','🎁','🛍️','🧴','🧼','🥤','🍫','🍪','☕','🧃','🥫','🧊','💊','🧪','🔌','💡','🔋','🧰','🔧','🪛','🧲','🧵','🪡','🧶','🎨','🖼️','🪴','🌱','🍎','🍌','🥖','🧀','🥩','🐟','🍗','🍕','🌮','🍔','🍟','🧁','🍰','🎂','🍩','🏷️','🎞️','🏆','🥈','🟫','📜','🗒️','🗓️'];
+        // ===== DEFAULT EMOJIS =====
+        const defaultEmojis = ['📦','📄','📋','📎','🖨️','📚','📝','✏️','🎁','🛍️','🧴','🧼','🥤','🍫','🍪','☕','🧃','🥫','🧊','💊','🧪','🔌','💡','🔋','🧰','🔧','🪛','🧲','🧵','🪡','🧶','🎨','🖼️','🪴','🌱','🍎','🍌','🥖','🧀','🥩','🐟','🍗','🍕','🌮','🍔','🍟','🧁','🍰','🎂','🍩'];
 
-        // ===== INIT DATA =====
-        function initData() {
-            if (!products) {
-                const v4 = JSON.parse(localStorage.getItem('products_v4') || 'null');
-                if (v4 && v4.length > 0) {
-                    products = v4.map(p => ({ ...p, minStock: p.minStock || 0 }));
-                } else {
-                    products = defaultProducts.map(p => ({
-                        id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-                        name: p.name,
-                        weight: p.weight,
-                        icon: p.icon,
-                        codes: [],
-                        minStock: 0,
-                        createdAt: Date.now()
-                    }));
+        // ===== MIGRATE LOCAL DATA TO FIRESTORE =====
+        async function migrateToFirestore() {
+            try {
+                const snapshot = await db.collection('products').get();
+                if (!snapshot.empty) return; // Already has data in Firestore
+
+                // Try localStorage v3
+                let localProducts = JSON.parse(localStorage.getItem('products_v3') || 'null');
+
+                if (!localProducts) {
+                    const v2 = JSON.parse(localStorage.getItem('products_v2') || 'null');
+                    if (v2 && v2.length > 0) {
+                        localProducts = v2;
+                    } else {
+                        const oldCodes = JSON.parse(localStorage.getItem('paper260_codes') || '[]');
+                        if (oldCodes.length > 0) {
+                            localProducts = [{
+                                id: 'p_' + Date.now(),
+                                name: 'ورق طباعة',
+                                weight: '260 غرام / م²',
+                                icon: '📄',
+                                codes: oldCodes,
+                                createdAt: Date.now()
+                            }];
+                        }
+                    }
                 }
-                activeProductId = products.length > 0 ? products[0].id : null;
-                saveProducts();
+
+                if (localProducts && localProducts.length > 0) {
+                    const batch = db.batch();
+                    localProducts.forEach(p => {
+                        const ref = db.collection('products').doc(p.id);
+                        batch.set(ref, {
+                            name: p.name,
+                            weight: p.weight || '',
+                            icon: p.icon || '📦',
+                            codes: p.codes || [],
+                            createdAt: firebase.firestore.Timestamp.fromDate(new Date(p.createdAt || Date.now()))
+                        });
+                    });
+                    await batch.commit();
+                    console.log('✅ Migration from localStorage to Firestore complete');
+                }
+            } catch (err) {
+                console.error('Migration error:', err);
             }
         }
 
-        // ===== MIGRATE =====
-        function migrateOldData() {
-            if (!products) {
-                const v4 = JSON.parse(localStorage.getItem('products_v4') || 'null');
-                if (v4 && v4.length > 0) {
-                    products = v4.map(p => ({ ...p, minStock: p.minStock || 0 }));
-                    activeProductId = localStorage.getItem('activeProductId_v4') || (products[0]?.id || null);
-                    saveProducts();
-                    return;
+        // ===== REALTIME LISTENER =====
+        function listenToProducts() {
+            db.collection('products').onSnapshot(snapshot => {
+                products = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                // Validate active product
+                if (activeProductId && !products.find(p => p.id === activeProductId)) {
+                    const sorted = getSortedProducts();
+                    activeProductId = sorted.length > 0 ? sorted[0].id : null;
+                    localStorage.setItem('activeProductId', activeProductId || '');
                 }
-                const v3 = JSON.parse(localStorage.getItem('products_v3') || 'null');
-                if (v3 && v3.length > 0) {
-                    products = v3.map(p => ({ ...p, minStock: 0 }));
-                    activeProductId = localStorage.getItem('activeProductId') || (products[0]?.id || null);
-                    saveProducts();
-                    return;
+
+                renderProductsList();
+                renderMainContent();
+
+                // Hide loading on first load
+                if (isFirstLoad) {
+                    isFirstLoad = false;
+                    const overlay = document.getElementById('loadingOverlay');
+                    overlay.classList.add('hidden');
+                    setTimeout(() => overlay.remove(), 600);
+                    showSyncBadge();
                 }
-                initData();
-            }
+            }, error => {
+                console.error('Firestore listener error:', error);
+                if (isFirstLoad) {
+                    isFirstLoad = false;
+                    const overlay = document.getElementById('loadingOverlay');
+                    overlay.classList.add('hidden');
+                    setTimeout(() => overlay.remove(), 600);
+                    showToast('⚠️ خطأ في الاتصال — وضع محلي', 'error');
+                    // Fallback to localStorage
+                    products = JSON.parse(localStorage.getItem('products_v3') || '[]');
+                    renderProductsList();
+                    renderMainContent();
+                }
+            });
+        }
+
+        function showSyncBadge() {
+            const badge = document.getElementById('syncBadge');
+            badge.classList.add('visible');
+            setTimeout(() => badge.classList.remove('visible'), 3000);
         }
 
         // ===== AUDIO CONTEXT =====
@@ -1586,79 +1463,43 @@
             return audioCtx;
         }
 
-        // ===== SHARP & BEAUTIFUL ADD SOUND (crystal chime) =====
         function playAddSound() {
             if (!soundEnabled) return;
             const ctx = getAudioContext();
             if (!ctx) return;
             const now = ctx.currentTime;
-
-            // Bright ascending crystal chime - sharp and pleasant
-            const notes = [
-                { freq: 1318.5, start: 0, dur: 0.15 },      // E6
-                { freq: 1567.98, start: 0.07, dur: 0.15 },  // G6
-                { freq: 2093.0, start: 0.14, dur: 0.2 },    // C7
-                { freq: 2637.0, start: 0.22, dur: 0.3 }     // E7
-            ];
-
-            notes.forEach(note => {
-                // Main tone (sine - pure)
+            [659, 831, 1047].forEach((freq, i) => {
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(note.freq, now + note.start);
-                gain.gain.setValueAtTime(0, now + note.start);
-                gain.gain.linearRampToValueAtTime(0.15, now + note.start + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + note.start + note.dur);
+                osc.frequency.setValueAtTime(freq, now + i * 0.06);
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.18, now + i * 0.06 + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.25);
                 osc.connect(gain);
                 gain.connect(ctx.destination);
-                osc.start(now + note.start);
-                osc.stop(now + note.start + note.dur + 0.05);
-
-                // Harmonic (triangle - adds brightness)
-                const osc2 = ctx.createOscillator();
-                const gain2 = ctx.createGain();
-                osc2.type = 'triangle';
-                osc2.frequency.setValueAtTime(note.freq * 2, now + note.start);
-                gain2.gain.setValueAtTime(0, now + note.start);
-                gain2.gain.linearRampToValueAtTime(0.05, now + note.start + 0.01);
-                gain2.gain.exponentialRampToValueAtTime(0.001, now + note.start + note.dur * 0.7);
-                osc2.connect(gain2);
-                gain2.connect(ctx.destination);
-                osc2.start(now + note.start);
-                osc2.stop(now + note.start + note.dur + 0.05);
+                osc.start(now + i * 0.06);
+                osc.stop(now + i * 0.06 + 0.26);
             });
         }
 
-        // ===== SHARP & BEAUTIFUL REMOVE SOUND (descending bell) =====
         function playRemoveSound() {
             if (!soundEnabled) return;
             const ctx = getAudioContext();
             if (!ctx) return;
             const now = ctx.currentTime;
-
-            // Sharp descending bell-like tone
-            const notes = [
-                { freq: 1760, start: 0, dur: 0.12 },        // A6
-                { freq: 1318.5, start: 0.08, dur: 0.15 },   // E6
-                { freq: 880, start: 0.18, dur: 0.25 }       // A5
-            ];
-
-            notes.forEach(note => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(note.freq, now + note.start);
-                // Slight pitch drop for bell effect
-                osc.frequency.exponentialRampToValueAtTime(note.freq * 0.97, now + note.start + note.dur);
-                gain.gain.setValueAtTime(0, now + note.start);
-                gain.gain.linearRampToValueAtTime(0.18, now + note.start + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + note.start + note.dur);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start(now + note.start);
-                osc.stop(now + note.start + note.dur + 0.05);
-            });
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(220, now + 0.25);
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.2, now + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.31);
         }
 
         function playErrorSound() {
@@ -1700,12 +1541,8 @@
         }
 
         // ===== INIT =====
-        document.addEventListener('DOMContentLoaded', () => {
-            migrateOldData();
+        document.addEventListener('DOMContentLoaded', async () => {
             renderEmojiPicker();
-            renderSelectorTrigger();
-            renderDropdown();
-            renderMainContent();
             updateSoundButton();
 
             const unlockAudio = () => {
@@ -1716,42 +1553,28 @@
             document.addEventListener('click', unlockAudio);
             document.addEventListener('touchstart', unlockAudio);
 
-            document.addEventListener('click', (e) => {
-                const wrapper = document.querySelector('.selector-wrapper');
-                if (wrapper && !wrapper.contains(e.target) && dropdownOpen) {
-                    closeDropdown();
-                }
-            });
+            // Migrate old localStorage data to Firestore
+            await migrateToFirestore();
 
-            // Min stock input preview
-            const minInput = document.getElementById('productMinStockInput');
-            if (minInput) {
-                minInput.addEventListener('input', updateMinStockPreview);
-            }
+            // Start realtime listener
+            listenToProducts();
         });
 
-        function updateMinStockPreview() {
-            const val = parseInt(document.getElementById('productMinStockInput').value) || 0;
-            const preview = document.getElementById('minStockPreview');
-            if (val > 0) {
-                preview.textContent = `⚠ عند ${val} أو أقل`;
-                preview.style.background = 'var(--warning-soft)';
-                preview.style.color = '#b45309';
-            } else {
-                preview.textContent = 'بدون حد';
-                preview.style.background = 'var(--off-white)';
-                preview.style.color = 'var(--ink-muted)';
-            }
-        }
-
-        // ===== SAVE =====
-        function saveProducts() {
-            localStorage.setItem('products_v5', JSON.stringify(products));
-            localStorage.setItem('activeProductId_v5', activeProductId || '');
-        }
-
+        // ===== HELPERS =====
         function getActiveProduct() {
             return products.find(p => p.id === activeProductId);
+        }
+
+        function getSortedProducts() {
+            return [...products].sort((a, b) => {
+                return a.name.localeCompare(b.name, 'ar', { sensitivity: 'base', numeric: true });
+            });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
         }
 
         // ===== TOAST =====
@@ -1764,158 +1587,128 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        // ===== DROPDOWN =====
-        function toggleDropdown() {
-            if (dropdownOpen) closeDropdown();
-            else openDropdown();
-        }
+        // ===== RENDER PRODUCTS LIST =====
+        function renderProductsList() {
+            const list = document.getElementById('productsList');
+            const countBadge = document.getElementById('productsCount');
+            if (countBadge) countBadge.textContent = products.length;
 
-        function openDropdown() {
-            dropdownOpen = true;
-            document.getElementById('selectorTrigger').classList.add('open');
-            document.getElementById('selectorDropdown').classList.add('open');
-            const search = document.getElementById('dropdownSearch');
-            search.value = '';
-            renderDropdown();
-            setTimeout(() => search.focus(), 100);
-        }
-
-        function closeDropdown() {
-            dropdownOpen = false;
-            document.getElementById('selectorTrigger').classList.remove('open');
-            document.getElementById('selectorDropdown').classList.remove('open');
-        }
-
-        function filterDropdown() {
-            renderDropdown();
-        }
-
-        function renderDropdown() {
-            const list = document.getElementById('dropdownList');
-            const searchTerm = document.getElementById('dropdownSearch').value.trim().toLowerCase();
-
-            let filtered = products;
-            if (searchTerm) {
-                filtered = products.filter(p => 
-                    p.name.toLowerCase().includes(searchTerm) ||
-                    (p.weight && p.weight.toLowerCase().includes(searchTerm))
-                );
-            }
-
-            if (filtered.length === 0) {
-                list.innerHTML = `<div class="dropdown-empty">لا توجد منتجات مطابقة</div>`;
-                return;
-            }
-
-            list.innerHTML = filtered.map(p => {
-                const isActive = p.id === activeProductId;
-                const count = p.codes.length;
-                const min = p.minStock || 0;
-                let countClass = '';
-                if (min > 0) {
-                    if (count <= min) countClass = count === 0 ? 'critical' : 'low';
-                }
-                return `
-                    <div class="dropdown-item ${isActive ? 'active' : ''}" onclick="selectProduct('${p.id}')">
-                        <div class="dropdown-item-icon">${p.icon}</div>
-                        <div class="dropdown-item-info">
-                            <div class="dropdown-item-name">${escapeHtml(p.name)}</div>
-                            <div class="dropdown-item-meta">${escapeHtml(p.weight || '—')}</div>
-                        </div>
-                        <div class="dropdown-item-count ${countClass}">${count}</div>
-                        <button class="dropdown-item-edit" onclick="event.stopPropagation(); editProduct('${p.id}')" title="تعديل">✎</button>
+            if (products.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-list">
+                        <div class="empty-icon">📭</div>
+                        <div>لا توجد منتجات بعد</div>
+                        <div style="font-size: 0.75rem; margin-top: 6px;">اضغط زر "＋" لإضافة منتج جديد</div>
                     </div>
                 `;
-            }).join('');
-        }
-
-        function renderSelectorTrigger() {
-            const product = getActiveProduct();
-            const icon = document.getElementById('selectorIcon');
-            const name = document.getElementById('selectorName');
-            const weight = document.getElementById('selectorWeight');
-            const count = document.getElementById('selectorCount');
-
-            if (!product) {
-                icon.textContent = '📦';
-                name.textContent = 'اختر منتجاً...';
-                weight.textContent = '—';
-                count.textContent = '0';
-                count.className = 'selector-count-badge';
                 return;
             }
 
-            icon.textContent = product.icon;
-            name.textContent = product.name;
-            weight.textContent = product.weight || '—';
-            const c = product.codes.length;
-            const min = product.minStock || 0;
-            let countClass = 'selector-count-badge';
-            if (min > 0) {
-                if (c <= min) countClass += c === 0 ? ' critical' : ' low';
-            }
-            count.textContent = c;
-            count.className = countClass;
-        }
+            const sorted = getSortedProducts();
 
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str || '';
-            return div.innerHTML;
+            list.innerHTML = sorted.map(p => `
+                <div class="product-card-mini ${p.id === activeProductId ? 'active' : ''}" onclick="selectProduct('${p.id}')">
+                    <div class="mini-icon">${p.icon}</div>
+                    <div class="mini-info">
+                        <div class="mini-name">${escapeHtml(p.name)}</div>
+                        <div class="mini-weight">${escapeHtml(p.weight || '—')}</div>
+                    </div>
+                    <div class="mini-count">${(p.codes || []).length}</div>
+                    <button class="mini-delete" onclick="event.stopPropagation(); deleteProduct('${p.id}')" title="حذف المنتج">✕</button>
+                </div>
+            `).join('');
         }
 
         // ===== SELECT PRODUCT =====
         function selectProduct(id) {
             activeProductId = id;
-            saveProducts();
-            renderSelectorTrigger();
-            renderDropdown();
+            localStorage.setItem('activeProductId', activeProductId || '');
+            renderProductsList();
             renderMainContent();
-            closeDropdown();
         }
 
-        // ===== EDIT PRODUCT =====
-        function editProduct(id) {
-            editingProductId = id;
+        // ===== CREATE NEW PRODUCT (Firestore) =====
+        async function createNewProduct() {
+            const name = document.getElementById('newProductName').value.trim();
+            const weight = document.getElementById('newProductWeight').value.trim();
+
+            if (!name) {
+                playErrorSound();
+                showToast('⚠️ الرجاء إدخال اسم المنتج', 'error');
+                return;
+            }
+
+            const id = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+
+            try {
+                await db.collection('products').doc(id).set({
+                    name,
+                    weight: weight || '',
+                    icon: selectedEmoji,
+                    codes: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                activeProductId = id;
+                localStorage.setItem('activeProductId', activeProductId);
+                closeNewProductModal();
+                playAddSound();
+                showToast('✅ تم إنشاء المنتج بنجاح', 'success');
+            } catch (err) {
+                console.error('Error creating product:', err);
+                playErrorSound();
+                showToast('⚠️ خطأ في إنشاء المنتج', 'error');
+            }
+        }
+
+        // ===== DELETE PRODUCT (Firestore) =====
+        async function deleteProduct(id) {
             const p = products.find(x => x.id === id);
-            if (!p) return;
-
-            document.getElementById('productModalTitle').innerHTML = '<span class="gold-icon">◆</span><span>تعديل المنتج</span>';
-            document.getElementById('productModalSubtitle').textContent = 'عدّل بيانات المنتج';
-            document.getElementById('productNameInput').value = p.name;
-            document.getElementById('productWeightInput').value = p.weight || '';
-            document.getElementById('productMinStockInput').value = p.minStock || 0;
-            selectedEmoji = p.icon;
-            renderEmojiPicker();
-            updateMinStockPreview();
-            document.getElementById('submitProductBtn').textContent = '✓ حفظ التعديلات';
-            document.getElementById('deleteProductBtn').style.display = 'block';
-            document.getElementById('productModal').classList.add('active');
-            closeDropdown();
-            setTimeout(() => document.getElementById('productNameInput').focus(), 100);
-        }
-
-        function editActiveProduct() {
-            if (activeProductId) editProduct(activeProductId);
-        }
-
-        // ===== DELETE PRODUCT =====
-        function deleteActiveProduct() {
-            if (!editingProductId) return;
-            const p = products.find(x => x.id === editingProductId);
             if (!p) return;
             if (!confirm(`هل أنت متأكد من حذف المنتج "${p.name}" وكل أرقامه؟`)) return;
 
-            products = products.filter(x => x.id !== editingProductId);
-            if (activeProductId === editingProductId) {
-                activeProductId = products.length > 0 ? products[0].id : null;
+            try {
+                await db.collection('products').doc(id).delete();
+
+                if (activeProductId === id) {
+                    const remaining = products.filter(x => x.id !== id);
+                    activeProductId = remaining.length > 0 ? remaining[0].id : null;
+                    localStorage.setItem('activeProductId', activeProductId || '');
+                }
+
+                showToast('🗑️ تم حذف المنتج', 'info');
+            } catch (err) {
+                console.error('Error deleting product:', err);
+                playErrorSound();
+                showToast('⚠️ خطأ في حذف المنتج', 'error');
             }
-            saveProducts();
-            renderSelectorTrigger();
-            renderDropdown();
-            renderMainContent();
-            closeProductModal();
-            showToast('🗑️ تم حذف المنتج', 'info');
+        }
+
+        // ===== DELETE ALL PRODUCTS (Firestore batch) =====
+        async function deleteAllProducts() {
+            if (products.length === 0) {
+                playErrorSound();
+                showToast('⚠️ لا توجد منتجات للحذف', 'error');
+                return;
+            }
+            if (!confirm(`هل أنت متأكد من حذف جميع المنتجات (${products.length})؟\nسيتم حذف كل المنتجات وأرقامها التسلسلية نهائياً!`)) return;
+
+            try {
+                const batch = db.batch();
+                products.forEach(p => {
+                    batch.delete(db.collection('products').doc(p.id));
+                });
+                await batch.commit();
+
+                activeProductId = null;
+                localStorage.setItem('activeProductId', '');
+                playRemoveSound();
+                showToast('🗑️ تم حذف جميع المنتجات', 'info');
+            } catch (err) {
+                console.error('Error deleting all products:', err);
+                playErrorSound();
+                showToast('⚠️ خطأ في الحذف', 'error');
+            }
         }
 
         // ===== RENDER MAIN CONTENT =====
@@ -1928,36 +1721,15 @@
                     <div class="product-card">
                         <div class="no-product-state">
                             <div class="big-icon">📦</div>
-                            <div class="big-text">لا يوجد أي منتج محدد</div>
-                            <button class="create-btn" onclick="openDropdown()">📋 اختر منتجاً</button>
-                            <button class="create-btn secondary" onclick="openNewProductModal()">➕ أضف منتجاً جديداً</button>
+                            <div class="big-text">لا يوجد أي منتج بعد</div>
+                            <button class="create-btn" onclick="openNewProductModal()">➕ إضافة منتج جديد</button>
                         </div>
                     </div>
                 `;
                 return;
             }
 
-            const count = product.codes.length;
-            const min = product.minStock || 0;
-            let stockStatus = 'ok';
-            let stockText = '✓ المخزون جيد';
-            if (min > 0) {
-                if (count === 0) {
-                    stockStatus = 'critical';
-                    stockText = `⚠ نفد المخزون (الحد الأدنى: ${min})`;
-                } else if (count <= min) {
-                    stockStatus = 'low';
-                    stockText = `⚠ المخزون منخفض (الحد الأدنى: ${min})`;
-                }
-            } else {
-                stockText = 'بدون حد أدنى';
-            }
-
-            let counterClass = 'counter-number';
-            if (min > 0) {
-                if (count === 0) counterClass += ' critical';
-                else if (count <= min) counterClass += ' low';
-            }
+            const codes = product.codes || [];
 
             container.innerHTML = `
                 <div class="product-card">
@@ -1965,20 +1737,8 @@
                     <div class="product-name">${escapeHtml(product.name)}</div>
                     <div class="product-weight">${escapeHtml(product.weight || '—')}</div>
 
-                    ${min > 0 ? `
-                        <div class="min-stock-info ${stockStatus}">
-                            <span>${stockText}</span>
-                            <button class="min-edit-btn" onclick="openMinStockModal()" title="تعديل الحد الأدنى">✎</button>
-                        </div>
-                    ` : `
-                        <div class="min-stock-info ok" style="cursor: pointer;" onclick="openMinStockModal()" title="تحديد الحد الأدنى">
-                            <span>${stockText}</span>
-                            <span style="opacity: 0.6;">✎</span>
-                        </div>
-                    `}
-
                     <div class="counter-display">
-                        <div class="${counterClass}" id="counter">${count}</div>
+                        <div class="counter-number" id="counter">${codes.length}</div>
                         <div class="counter-label">العدد المسجّل</div>
                     </div>
 
@@ -1996,7 +1756,7 @@
 
                 <div class="list-section">
                     <div class="list-header">
-                        <span class="list-title"><span class="gold-dot">◆</span> الأرقام التسلسلية</span>
+                        <span class="list-title">📋 الأرقام التسلسلية</span>
                         <button class="clear-btn" onclick="clearAll()">مسح الكل</button>
                     </div>
                     <div class="codes-list" id="codesList"></div>
@@ -2013,7 +1773,9 @@
             const product = getActiveProduct();
             if (!product) return;
 
-            if (product.codes.length === 0) {
+            const codes = product.codes || [];
+
+            if (codes.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">📭</div>
@@ -2023,11 +1785,11 @@
             }
 
             const codeCounts = {};
-            product.codes.forEach(item => {
+            codes.forEach(item => {
                 codeCounts[item.code] = (codeCounts[item.code] || 0) + 1;
             });
 
-            list.innerHTML = product.codes.map((item, index) => {
+            list.innerHTML = codes.map((item, index) => {
                 const count = codeCounts[item.code];
                 const duplicateBadge = count > 1 
                     ? `<span class="code-duplicate-badge">×${count}</span>` 
@@ -2049,14 +1811,14 @@
             const el = document.getElementById('counter');
             const product = getActiveProduct();
             if (!el || !product) return;
-            el.textContent = product.codes.length;
+            el.textContent = (product.codes || []).length;
             el.classList.remove('bump');
             void el.offsetWidth;
             el.classList.add('bump');
         }
 
-        // ===== ADD CODE =====
-        function addCode(code) {
+        // ===== ADD CODE (Firestore arrayUnion) =====
+        async function addCode(code) {
             code = code.trim();
             if (!code) return;
             const product = getActiveProduct();
@@ -2065,81 +1827,100 @@
             const now = new Date();
             const timeStr = now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
 
-            product.codes.push({ code, time: timeStr });
-            saveProducts();
-            renderCodesList();
-            updateCounter();
-            renderSelectorTrigger();
-            renderDropdown();
-            renderMainContent();
-            playAddSound();
-            showToast('✅ تمت الإضافة بنجاح', 'success');
+            try {
+                await db.collection('products').doc(product.id).update({
+                    codes: firebase.firestore.FieldValue.arrayUnion({ code, time: timeStr })
+                });
+                playAddSound();
+                showToast('✅ تمت الإضافة بنجاح', 'success');
+            } catch (err) {
+                console.error('Error adding code:', err);
+                playErrorSound();
+                showToast('⚠️ خطأ في الإضافة', 'error');
+            }
         }
 
-        // ===== REMOVE CODE =====
-        function removeCode(code) {
+        // ===== REMOVE CODE (Firestore read + update) =====
+        async function removeCode(code) {
             code = code.trim();
             if (!code) return;
             const product = getActiveProduct();
             if (!product) return;
 
-            let lastIndex = -1;
-            for (let i = product.codes.length - 1; i >= 0; i--) {
-                if (product.codes[i].code === code) {
-                    lastIndex = i;
-                    break;
+            try {
+                const docRef = db.collection('products').doc(product.id);
+                const doc = await docRef.get();
+                const data = doc.data();
+                const codes = data.codes || [];
+
+                let lastIndex = -1;
+                for (let i = codes.length - 1; i >= 0; i--) {
+                    if (codes[i].code === code) {
+                        lastIndex = i;
+                        break;
+                    }
                 }
-            }
 
-            if (lastIndex === -1) {
+                if (lastIndex === -1) {
+                    playErrorSound();
+                    showToast('⚠️ هذا الرقم غير موجود في القائمة!', 'error');
+                    return;
+                }
+
+                codes.splice(lastIndex, 1);
+                await docRef.update({ codes });
+                playRemoveSound();
+                showToast('🗑️ تم الحذف بنجاح', 'success');
+            } catch (err) {
+                console.error('Error removing code:', err);
                 playErrorSound();
-                showToast('⚠️ هذا الرقم غير موجود في القائمة!', 'error');
-                return;
+                showToast('⚠️ خطأ في الحذف', 'error');
             }
-
-            product.codes.splice(lastIndex, 1);
-            saveProducts();
-            renderCodesList();
-            updateCounter();
-            renderSelectorTrigger();
-            renderDropdown();
-            renderMainContent();
-            playRemoveSound();
-            showToast('🗑️ تم الحذف بنجاح', 'success');
         }
 
-        function deleteCode(index) {
+        // ===== DELETE SINGLE CODE BY INDEX (Firestore) =====
+        async function deleteCode(index) {
             const product = getActiveProduct();
             if (!product) return;
-            product.codes.splice(index, 1);
-            saveProducts();
-            renderCodesList();
-            updateCounter();
-            renderSelectorTrigger();
-            renderDropdown();
-            renderMainContent();
-            playRemoveSound();
-            showToast('🗑️ تم الحذف', 'info');
+
+            try {
+                const docRef = db.collection('products').doc(product.id);
+                const doc = await docRef.get();
+                const data = doc.data();
+                const codes = data.codes || [];
+
+                if (index < 0 || index >= codes.length) return;
+
+                codes.splice(index, 1);
+                await docRef.update({ codes });
+                playRemoveSound();
+                showToast('🗑️ تم الحذف', 'info');
+            } catch (err) {
+                console.error('Error deleting code:', err);
+                playErrorSound();
+                showToast('⚠️ خطأ في الحذف', 'error');
+            }
         }
 
-        function clearAll() {
+        // ===== CLEAR ALL CODES (Firestore) =====
+        async function clearAll() {
             const product = getActiveProduct();
             if (!product) return;
-            if (product.codes.length === 0) return;
-            if (confirm('هل أنت متأكد من حذف جميع الأرقام؟')) {
-                product.codes = [];
-                saveProducts();
-                renderCodesList();
-                updateCounter();
-                renderSelectorTrigger();
-                renderDropdown();
-                renderMainContent();
+            if ((product.codes || []).length === 0) return;
+            if (!confirm('هل أنت متأكد من حذف جميع الأرقام؟')) return;
+
+            try {
+                await db.collection('products').doc(product.id).update({ codes: [] });
                 playRemoveSound();
                 showToast('🗑️ تم مسح جميع الأرقام', 'info');
+            } catch (err) {
+                console.error('Error clearing codes:', err);
+                playErrorSound();
+                showToast('⚠️ خطأ في المسح', 'error');
             }
         }
 
-        // ===== PRODUCT MODAL =====
+        // ===== NEW PRODUCT MODAL =====
         function renderEmojiPicker() {
             const picker = document.getElementById('emojiPicker');
             picker.innerHTML = defaultEmojis.map(e => `
@@ -2154,101 +1935,16 @@
         }
 
         function openNewProductModal() {
-            editingProductId = null;
-            document.getElementById('productModalTitle').innerHTML = '<span class="gold-icon">◆</span><span>إضافة منتج جديد</span>';
-            document.getElementById('productModalSubtitle').textContent = 'أدخل بيانات المنتج الذي تريد إضافته';
-            document.getElementById('productNameInput').value = '';
-            document.getElementById('productWeightInput').value = '';
-            document.getElementById('productMinStockInput').value = '0';
+            document.getElementById('newProductModal').classList.add('active');
+            document.getElementById('newProductName').value = '';
+            document.getElementById('newProductWeight').value = '';
             selectedEmoji = '📦';
             renderEmojiPicker();
-            updateMinStockPreview();
-            document.getElementById('submitProductBtn').textContent = '✓ إنشاء المنتج';
-            document.getElementById('deleteProductBtn').style.display = 'none';
-            document.getElementById('productModal').classList.add('active');
-            closeDropdown();
-            setTimeout(() => document.getElementById('productNameInput').focus(), 100);
+            setTimeout(() => document.getElementById('newProductName').focus(), 100);
         }
 
-        function closeProductModal() {
-            document.getElementById('productModal').classList.remove('active');
-            editingProductId = null;
-        }
-
-        function submitProduct() {
-            const name = document.getElementById('productNameInput').value.trim();
-            const weight = document.getElementById('productWeightInput').value.trim();
-            const minStock = parseInt(document.getElementById('productMinStockInput').value) || 0;
-
-            if (!name) {
-                playErrorSound();
-                showToast('⚠️ الرجاء إدخال اسم المنتج', 'error');
-                return;
-            }
-
-            if (editingProductId) {
-                const p = products.find(x => x.id === editingProductId);
-                if (!p) return;
-                p.name = name;
-                p.weight = weight;
-                p.icon = selectedEmoji;
-                p.minStock = minStock;
-                saveProducts();
-                renderSelectorTrigger();
-                renderDropdown();
-                renderMainContent();
-                closeProductModal();
-                playAddSound();
-                showToast('✅ تم تحديث المنتج بنجاح', 'success');
-            } else {
-                const newProduct = {
-                    id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-                    name,
-                    weight: weight || '',
-                    icon: selectedEmoji,
-                    codes: [],
-                    minStock: minStock,
-                    createdAt: Date.now()
-                };
-
-                products.push(newProduct);
-                activeProductId = newProduct.id;
-                saveProducts();
-                renderSelectorTrigger();
-                renderDropdown();
-                renderMainContent();
-                closeProductModal();
-                playAddSound();
-                showToast('✅ تم إنشاء المنتج بنجاح', 'success');
-            }
-        }
-
-        // ===== MIN STOCK MODAL =====
-        function openMinStockModal() {
-            const product = getActiveProduct();
-            if (!product) return;
-            document.getElementById('minStockModalSubtitle').textContent = `الحد الأدنى لـ "${product.name}"`;
-            document.getElementById('minStockEditInput').value = product.minStock || 0;
-            document.getElementById('minStockModal').classList.add('active');
-            setTimeout(() => document.getElementById('minStockEditInput').focus(), 100);
-        }
-
-        function closeMinStockModal() {
-            document.getElementById('minStockModal').classList.remove('active');
-        }
-
-        function saveMinStock() {
-            const product = getActiveProduct();
-            if (!product) return;
-            const val = parseInt(document.getElementById('minStockEditInput').value) || 0;
-            product.minStock = Math.max(0, val);
-            saveProducts();
-            renderSelectorTrigger();
-            renderDropdown();
-            renderMainContent();
-            closeMinStockModal();
-            playAddSound();
-            showToast('✅ تم حفظ الحد الأدنى', 'success');
+        function closeNewProductModal() {
+            document.getElementById('newProductModal').classList.remove('active');
         }
 
         // ===== SCANNER =====
@@ -2265,10 +1961,10 @@
             const subtitle = document.getElementById('modalSubtitle');
 
             if (mode === 'add') {
-                title.innerHTML = `<span class="gold-icon">◆</span><span>إضافة — ${escapeHtml(product.name)}</span>`;
+                title.textContent = `➕ إضافة رقم — ${product.name}`;
                 subtitle.textContent = 'وجّه الكاميرا نحو الباركود أو أدخل الرقم يدوياً';
             } else {
-                title.innerHTML = `<span class="gold-icon">◆</span><span>حذف — ${escapeHtml(product.name)}</span>`;
+                title.textContent = `➖ حذف رقم — ${product.name}`;
                 subtitle.textContent = 'وجّه الكاميرا نحو الباركود أو أدخل الرقم يدوياً';
             }
 
@@ -2324,8 +2020,11 @@
         function onScanSuccess(decodedText) {
             stopCamera();
 
-            if (currentMode === 'add') addCode(decodedText);
-            else removeCode(decodedText);
+            if (currentMode === 'add') {
+                addCode(decodedText);
+            } else {
+                removeCode(decodedText);
+            }
 
             setTimeout(() => closeScanner(), 500);
         }
@@ -2342,40 +2041,34 @@
 
             stopCamera();
 
-            if (currentMode === 'add') addCode(code);
-            else removeCode(code);
+            if (currentMode === 'add') {
+                addCode(code);
+            } else {
+                removeCode(code);
+            }
 
             setTimeout(() => closeScanner(), 500);
         }
 
+        // Enter key for manual input
         document.getElementById('manualCode').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleManualInput();
         });
 
+        // Close modals on overlay click
         document.getElementById('scannerModal').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) closeScanner();
         });
-        document.getElementById('productModal').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeProductModal();
-        });
-        document.getElementById('minStockModal').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeMinStockModal();
+        document.getElementById('newProductModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeNewProductModal();
         });
 
-        document.getElementById('productNameInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('productWeightInput').focus();
+        // Enter key for new product name
+        document.getElementById('newProductName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('newProductWeight').focus();
         });
-        document.getElementById('productWeightInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('productMinStockInput').focus();
-        });
-        document.getElementById('minStockEditInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') saveMinStock();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (dropdownOpen) closeDropdown();
-            }
+        document.getElementById('newProductWeight').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') createNewProduct();
         });
     </script>
 </body>
